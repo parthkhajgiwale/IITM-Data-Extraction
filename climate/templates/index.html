@@ -22,7 +22,7 @@
     </style>
 </head>
 <body>
-    <h2>Select Coordinates, Climate Variable, and Date Range</h2>
+    <h2>Select Coordinates, Climate Variable, Model, and Date Range</h2>
 
     <div id="map"></div>
 
@@ -39,6 +39,13 @@
     </select>
     <br><br>
 
+    <label for="model">Select Model:</label>
+    <select id="model" onchange="toggleSpatialPlotButton()">
+        <option value="CMIP6">CMIP6</option>
+        <option value="WAS-44i">WAS-44i</option>
+    </select>
+    <br><br>
+
     <label for="start_date">Start Date:</label>
     <input type="month" id="start_date">
     <label for="end_date">End Date:</label>
@@ -47,6 +54,9 @@
 
     <button onclick="fetchData()">Plot Time Series</button>
     <button onclick="downloadCSV()">Download CSV</button>
+
+    <!-- Spatial Plot Button, initially hidden -->
+    <button id="spatial-plot-btn" style="display:none;" onclick="getSpatialPlot()">Get Spatial Plot</button>
 
     <div id="plot"></div>
 
@@ -71,39 +81,32 @@
         }).addTo(map);
 
         var polygonLayer = L.layerGroup().addTo(map);
-        var points = []; // To store the points clicked by the user
-        var polygon; // Variable to hold the drawn polygon
+        var points = [];
+        var polygon;
 
-        // Handle map clicks and add points to the polygon
         map.on('click', function(e) {
             var lat = e.latlng.lat.toFixed(5);
             var lon = e.latlng.lng.toFixed(5);
 
-            // Add point to the points array
             points.push({ lat: lat, lon: lon });
-
-            // Update the table with the selected coordinates
             updateCoordinatesTable();
 
-            // Draw or update the polygon with the new point
             if (points.length >= 3) {
                 var latlngs = points.map(p => [parseFloat(p.lat), parseFloat(p.lon)]);
                 if (polygon) {
-                    polygon.setLatLngs(latlngs); // Update existing polygon
+                    polygon.setLatLngs(latlngs);
                 } else {
                     polygon = L.polygon(latlngs, { color: 'blue' }).addTo(polygonLayer);
                 }
             }
 
-            // Update the latitude and longitude inputs (for the last point clicked)
             document.getElementById('lat').value = lat;
             document.getElementById('lon').value = lon;
         });
 
-        // Update the coordinates table
         function updateCoordinatesTable() {
             var tableBody = document.querySelector("#coordinates-table tbody");
-            tableBody.innerHTML = ""; // Clear current table rows
+            tableBody.innerHTML = "";
 
             points.forEach(function(point) {
                 var row = document.createElement('tr');
@@ -117,89 +120,86 @@
             });
         }
 
-        // Fetch and plot data for the bounded region (polygon)
+        // Function to handle showing/hiding the spatial plot button based on model selection
+        function toggleSpatialPlotButton() {
+            const model = document.getElementById('model').value;
+            const spatialPlotBtn = document.getElementById('spatial-plot-btn');
+            spatialPlotBtn.style.display = (model === 'CMIP6') ? 'inline' : 'none';
+        }
+
+        // Function to fetch and display time series data
         function fetchData() {
-            var startDate = document.getElementById("start_date").value;
-            var endDate = document.getElementById("end_date").value;
-            var variable = document.getElementById("variable").value;
+            var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
+            var variable = document.getElementById('variable').value;
+            var model = document.getElementById('model').value;
+            var startDate = document.getElementById('start_date').value;
+            var endDate = document.getElementById('end_date').value;
 
-            if (startDate && endDate && variable) {
-                if (points.length === 0) {
-                    alert("Please select at least one point.");
-                    return;
-                }
+            var url = `/get_timeseries?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}`;
 
-                if (points.length === 1) {
-                    // Single point: Fetch data for that specific point
-                    var lat = points[0].lat;
-                    var lon = points[0].lon;
-                    fetch(`/get_timeseries?lat=${lat}&lon=${lon}&variable=${variable}&start_date=${startDate}&end_date=${endDate}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            plotGraph(data, variable);
-                        });
-                } else {
-                    // Multiple points (forming a polygon): Fetch data for the region
-                    var polygonCoords = points.map(p => `${p.lat},${p.lon}`).join(';');
-                    fetch(`/get_timeseries?coordinates=${polygonCoords}&variable=${variable}&start_date=${startDate}&end_date=${endDate}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            plotGraph(data, variable);
-                        });
-                }
-            } else {
-                alert("Please provide the required inputs.");
-            }
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        var times = data.map(row => new Date(row.time));
+                        var values = data.map(row => row[variable]);
+
+                        var trace = {
+                            x: times,
+                            y: values,
+                            mode: 'lines',
+                            type: 'scatter'
+                        };
+
+                        var layout = {
+                            title: `${variable} Time Series (${model})`,
+                            xaxis: { title: 'Date' },
+                            yaxis: { title: variable }
+                        };
+
+                        Plotly.newPlot('plot', [trace], layout);
+                    } else {
+                        alert('No data available for the selected parameters.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching data:', error);
+                });
         }
 
-        // Function to plot the graph
-        function plotGraph(data, variable) {
-            if (data.error) {
-                alert('Error: ' + data.error);
-            } else {
-                var dates = data.map(row => row.time);
-                var values = data.map(row => row[variable]);
-
-                var trace = {
-                    x: dates,
-                    y: values,
-                    type: 'scatter'
-                };
-                var layout = {
-                    title: `Time Series for ${variable}`,
-                    xaxis: { title: 'Date' },
-                    yaxis: { title: variable }
-                };
-
-                Plotly.newPlot('plot', [trace], layout);
-            }
-        }
-
-        // Download CSV data for the bounded region or single point
+        // Function to download data as CSV
         function downloadCSV() {
-            var startDate = document.getElementById("start_date").value;
-            var endDate = document.getElementById("end_date").value;
-            var variable = document.getElementById("variable").value;
+            var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
+            var variable = document.getElementById('variable').value;
+            var model = document.getElementById('model').value;
+            var startDate = document.getElementById('start_date').value;
+            var endDate = document.getElementById('end_date').value;
 
-            if (startDate && endDate && variable) {
-                if (points.length === 0) {
-                    alert("Please select at least one point.");
-                    return;
-                }
+            var url = `/download_csv?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}`;
+            window.location.href = url;
+        }
 
-                if (points.length === 1) {
-                    // Single point: Download data for that specific point
-                    var lat = points[0].lat;
-                    var lon = points[0].lon;
-                    window.location.href = `/download_csv?lat=${lat}&lon=${lon}&variable=${variable}&start_date=${startDate}&end_date=${endDate}`;
-                } else {
-                    // Multiple points: Download data for the region
-                    var polygonCoords = points.map(p => `${p.lat},${p.lon}`).join(';');
-                    window.location.href = `/download_csv?coordinates=${polygonCoords}&variable=${variable}&start_date=${startDate}&end_date=${endDate}`;
-                }
-            } else {
-                alert("Please provide the required inputs.");
-            }
+        // Function to fetch and display spatial plot
+        function getSpatialPlot() {
+            var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
+            var variable = document.getElementById('variable').value;
+            var model = document.getElementById('model').value;
+            var startDate = document.getElementById('start_date').value;
+            var endDate = document.getElementById('end_date').value;
+
+            var url = `/get_spatial_plot?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}`;
+
+            fetch(url)
+                .then(response => response.blob())
+                .then(imageBlob => {
+                    const imgElement = document.createElement('img');
+                    imgElement.src = URL.createObjectURL(imageBlob);
+                    document.getElementById('plot').innerHTML = '';
+                    document.getElementById('plot').appendChild(imgElement);
+                })
+                .catch(error => {
+                    console.error('Error fetching spatial plot:', error);
+                });
         }
     </script>
 </body>
