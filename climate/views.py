@@ -49,7 +49,6 @@ def home(request):
     models = ['CMIP6', 'WAS-44i']
     return render(request, 'index.html', {'climate_variables': climate_variables, 'models': models})
 
-
 def get_timeseries(request):
     """Fetch and return time-series data as JSON."""
     try:

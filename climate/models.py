@@ -1,5 +1,4 @@
 from django.db import models
-
 class ClimateFile(models.Model):
     variable_name = models.CharField(max_length=50)
     file_path = models.TextField()  # Path to the climate data file
