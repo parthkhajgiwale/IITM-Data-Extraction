@@ -1,18 +1,24 @@
 import matplotlib
-matplotlib.use('Agg')  # Use non-interactive backend for web server
-
+matplotlib.use('Agg')  # Use the 'Agg' backend for headless environments
 import matplotlib.pyplot as plt
+import cartopy.crs as ccrs
+import cartopy.feature as cfeature
 import numpy as np
 import xarray as xr
 import pandas as pd
 import cftime
+from sklearn.preprocessing import StandardScaler
+from scipy.interpolate import griddata
 import io
 from datetime import datetime
 import psycopg2
 from django.conf import settings
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
+import logging
 
+logger = logging.getLogger(__name__)
+plt.clf()
 # Database configuration
 DB_CONFIG = settings.DB_CONFIG
 
@@ -48,6 +54,132 @@ def home(request):
     climate_variables = ['vas', 'tas', 'pr']
     models = ['CMIP6', 'WAS-44i']
     return render(request, 'index.html', {'climate_variables': climate_variables, 'models': models})
+
+
+def home(request):
+    """Render the homepage with variable and model options."""
+    climate_variables = ['vas', 'tas', 'pr']
+    models = ['CMIP6', 'WAS-44i']
+    return render(request, 'index.html', {'climate_variables': climate_variables, 'models': models})
+
+
+def get_spatial_plot(request):
+    try:
+        # Extract parameters from the request
+        variable = request.GET.get('variable')
+        model = request.GET.get('model')
+        start_date = request.GET.get('start_date')
+        end_date = request.GET.get('end_date')
+        coordinates_str = request.GET.get('coordinates')
+
+        # Validate required parameters
+        if not all([variable, model, start_date, end_date, coordinates_str]):
+            logger.error("Missing required parameters.")
+            return JsonResponse({"error": "Missing required parameters"}, status=400)
+
+        # Parse coordinates
+        coordinates = [tuple(map(float, coord.split(','))) for coord in coordinates_str.split(';')]
+        if not coordinates:
+            logger.error("No valid coordinates provided.")
+            return JsonResponse({"error": "No valid coordinates provided."}, status=400)
+
+        lons = np.array([coord[1] for coord in coordinates])
+        lats = np.array([coord[0] for coord in coordinates])
+
+        # Retrieve file paths
+        file_paths = get_file_paths(variable, model)
+        if not file_paths:
+            logger.error(f"No data available for variable '{variable}' and model '{model}'.")
+            return JsonResponse({'error': f"No data available for variable '{variable}' and model '{model}'."}, status=404)
+
+        # Open dataset
+        datasets = xr.open_mfdataset(file_paths, combine='by_coords')
+
+        # Validate variable exists in dataset
+        if variable not in datasets:
+            logger.error(f"Variable '{variable}' not found in the dataset.")
+            return JsonResponse({'error': f"Variable '{variable}' not found in the dataset."}, status=400)
+
+        # Time filtering logic
+        time_dim = datasets['time']
+        if isinstance(time_dim.values[0], cftime.datetime):
+            time_dim_values = normalize_cftime_to_gregorian(time_dim.values)
+        else:
+            time_dim_values = pd.to_datetime(time_dim.values)
+
+        datasets.coords['time'] = time_dim_values
+
+        # Apply time range filter
+        start_date_dt = pd.Timestamp(start_date)
+        end_date_dt = pd.Timestamp(end_date)
+        time_filtered_data = datasets[variable].sel(time=slice(start_date_dt, end_date_dt))
+
+        # Handle regional data selection
+        min_lat, max_lat = min(lats), max(lats)
+        min_lon, max_lon = min(lons), max(lons)
+        regional_data = time_filtered_data.sel(lat=slice(min_lat, max_lat), lon=slice(min_lon, max_lon))
+
+        # Get lat and lon grid for the regional data
+        lon_values, lat_values = np.meshgrid(regional_data.lon.values, regional_data.lat.values)
+
+        # Check shapes of the grid and data
+        print(f"Shape of lon_values: {lon_values.shape}")
+        print(f"Shape of lat_values: {lat_values.shape}")
+        print(f"Shape of data_values: {regional_data.values.shape}")
+
+        # Select a specific time step (e.g., the first time step)
+        data_values = regional_data.values[0, :, :]  # Selecting the first time step for simplicity
+
+        # Ensure lon_values, lat_values, and data_values are the same shape
+        if lon_values.shape != lat_values.shape or lon_values.shape != data_values.shape:
+            raise ValueError(f"Shape mismatch: lon_values, lat_values, and data_values must have the same shape.")
+
+        # Perform interpolation at the requested coordinates
+        interpolated_values = griddata(
+            (lon_values.flatten(), lat_values.flatten()),
+            data_values.flatten(),
+            (lons, lats),
+            method='linear'
+        )
+
+        # Handle NaN values in the interpolated results
+        interpolated_values = np.nan_to_num(interpolated_values, nan=0)
+
+        # Create contour plot
+        fig, ax = plt.subplots(figsize=(8, 6), dpi=200, subplot_kw={'projection': ccrs.PlateCarree()})
+        ax.set_extent([min_lon, max_lon, min_lat, max_lat], crs=ccrs.PlateCarree())
+
+        # Add features to the map
+        ax.add_feature(cfeature.LAND, edgecolor='black')
+        ax.add_feature(cfeature.COASTLINE, edgecolor='black')
+        ax.add_feature(cfeature.BORDERS, edgecolor='gray', linestyle=':', linewidth=1)
+        ax.gridlines(draw_labels=True, linewidth=1, color='gray', linestyle='--')
+
+        # Create contour plot
+        contour = ax.contourf(lon_values, lat_values, data_values, 20, cmap='viridis', transform=ccrs.PlateCarree())
+
+        # Add color bar
+        cbar = plt.colorbar(contour, ax=ax, orientation='vertical', pad=0.05)
+        cbar.set_label(f'Concentration of {variable}', fontsize=12)
+
+        # Title for the plot
+        plt.title(f'Spatial Distribution of {variable} ({model})', fontsize=16)
+
+        # Save plot to buffer
+        buffer = io.BytesIO()
+        plt.savefig(buffer, format='png', bbox_inches='tight')
+        buffer.seek(0)
+
+        # Return the plot as an HTTP response
+        return HttpResponse(buffer, content_type='image/png')
+
+    except ValueError as ve:
+        logger.error(f"ValueError: {ve}")
+        return JsonResponse({"error": str(ve)}, status=400)
+    except Exception as e:
+        logger.error(f"An error occurred: {str(e)}")
+        return JsonResponse({"error": f"An error occurred: {str(e)}"}, status=500)
+
 
 def get_timeseries(request):
     """Fetch and return time-series data as JSON."""

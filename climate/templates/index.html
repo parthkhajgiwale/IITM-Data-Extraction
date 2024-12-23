@@ -2,205 +2,448 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Climate Data Explorer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.12.1/plotly.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
     <style>
-        #map { height: 400px; }
-        #plot { width: 100%; height: 400px; }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Navbar */
+        nav {
+            background-color: #094183;
+            padding: 10px;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Logo styles */
+        nav img {
+            width: 60px;
+            height: auto;
+            margin-right: 15px;
+        }
+
+        nav h1 {
+            margin: 0;
+            font-size: 24px;
+            text-align: left;
+            flex-grow: 1;
+        }
+
+       nav button {
+        background-color: #094183;
+        color: white;
+        border: 2px solid white; /* Add white border */
+        padding: 10px 20px;
+        cursor: pointer;
+        font-size: 14px;
+        border-radius: 5px;
+    }
+
+    nav button:hover {
+        color: #094183;
+        background-color: white;
+        border: 2px solid white; /* Maintain white border on hover */
+    }
+
+
+        /* Main container */
+        .main-container {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            height: calc(100vh - 60px);
+            flex: 1;
+        }
+
+        /* Left Panel */
+        .left-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+            overflow-y: auto;  /* Make the panel scrollable */
+        }
+
+        .guide {
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .guide h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+        }
+
+        .guide ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .guide li {
+            margin-bottom: 10px;
+        }
+
+        .guide li strong {
+            font-weight: bold;
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .controls label {
+            font-weight: bold;
+        }
+
+        select, input, button {
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+        }
+
+        select, input {
+            margin-bottom: 10px;
+        }
+
+        button {
+            background-color: #094183;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        /* Right Panel: Map */
+        .right-panel {
+            flex: 2;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            height: 100%;
+        }
+
+        #map {
+            flex: 1;
+            border: 1px solid #ccc;
+            height: 100%;
+        }
+
+        /* Plot container */
+        #plot-container {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            visibility: hidden;  /* Keep it hidden initially */
+            flex-grow: 1; /* Allow plot container to grow and occupy space */
+        }
+
+        #plot-container div {
+            padding: 10px;
+            border-radius: 6px;
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
         }
+
         th, td {
             border: 1px solid #ddd;
             padding: 8px;
             text-align: left;
         }
+
         th {
             background-color: #f2f2f2;
         }
+
+        .coordinates-container {
+            max-height: 200px; /* Limit height */
+            overflow-y: auto; /* Enable scrolling when coordinates are many */
+            margin-top: 20px;
+        }
+
+        #hover-coordinates {
+            margin-top: 10px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
     </style>
 </head>
 <body>
-    <h2>Select Coordinates, Climate Variable, Model, and Date Range</h2>
 
-    <div id="map"></div>
+    <!-- Navbar -->
+    <nav>
+        <img src="https://upload.wikimedia.org/wikipedia/en/4/44/Indian_Institute_of_Tropical_Meteorology_Logo.png" alt="IITM Logo">
+        <h1>Climate Data Explorer</h1>
+        <button id="logoutBtn">Logout</button>
+    </nav>
 
-    <br>
-    Latitude: <input type="text" id="lat" placeholder="Latitude" readonly>
-    Longitude: <input type="text" id="lon" placeholder="Longitude" readonly>
-    <br><br>
+    <!-- Main Content -->
+    <div class="main-container">
+        <!-- Left Panel: Controls -->
+        <div class="left-panel">
+            <!-- Guide Section (Collapsible) -->
+            <button id="guide-toggle" onclick="toggleGuide()">Show Guide</button>
+            <div class="guide" id="guideSection" style="display: none;">
+                <h2>How to Use the Climate Data Explorer</h2>
+                <ul>
+                    <li><strong>Select Climate Variable:</strong> Choose the climate variable you want to explore (e.g., Temperature, Wind Speed, Precipitation).</li>
+                    <li><strong>Select Model:</strong> Choose the model for the climate data. Options include WAS-44i and CMIP6.</li>
+                    <li><strong>Set Date Range:</strong> Pick a start and end date using the date picker.</li>
+                    <li><strong>Select Coordinates:</strong> Click on the map to select the coordinates for your data exploration.</li>
+                    <li><strong>Plot Data:</strong> Once you've selected the data, click the "Plot Time Series" button to visualize the data over time.</li>
+                    <li><strong>Download Data:</strong> You can download the data in CSV format by clicking the "Download CSV" button.</li>
+                    <li><strong>Spatial Plot:</strong> If you selected the CMIP6 model, you can generate a spatial plot of the data by clicking "Get Spatial Plot".</li>
+                </ul>
+            </div>
 
-    <label for="variable">Select Climate Variable:</label>
-    <select id="variable">
-        {% for variable in climate_variables %}
-            <option value="{{ variable }}">{{ variable }}</option>
-        {% endfor %}
-    </select>
-    <br><br>
+            <!-- Controls Section -->
+            <div class="controls">
+                <label for="variable">Select Climate Variable:</label>
+                <select id="variable">
+                    <option value="tas">Temperature (tas)</option>
+                    <option value="vas">Wind Speed (vas)</option>
+                    <option value="pr">Precipitation (pr)</option>
+                </select>
 
-    <label for="model">Select Model:</label>
-    <select id="model" onchange="toggleSpatialPlotButton()">
-        <option value="CMIP6">CMIP6</option>
-        <option value="WAS-44i">WAS-44i</option>
-    </select>
-    <br><br>
+                <label for="model">Select Model:</label>
+                <select id="model" onchange="toggleSpatialPlotButton()">
+                    <option value="WAS-44i">WAS-44i</option>
+                    <option value="CMIP6">CMIP6</option>
+                </select>
 
-    <label for="start_date">Start Date:</label>
-    <input type="month" id="start_date">
-    <label for="end_date">End Date:</label>
-    <input type="month" id="end_date">
-    <br><br>
+                <label for="start_date">Start Date:</label>
+                <input type="month" id="start_date">
 
-    <button onclick="fetchData()">Plot Time Series</button>
-    <button onclick="downloadCSV()">Download CSV</button>
+                <label for="end_date">End Date:</label>
+                <input type="month" id="end_date">
 
-    <!-- Spatial Plot Button, initially hidden -->
-    <button id="spatial-plot-btn" style="display:none;" onclick="getSpatialPlot()">Get Spatial Plot</button>
+                <button onclick="fetchData()">Plot Time Series</button>
+                <button onclick="downloadCSV()">Download CSV</button>
+                <button id="spatial-plot-btn" style="display: none;" onclick="getSpatialPlot()">Get Spatial Plot</button>
+            </div>
 
-    <div id="plot"></div>
+            <!-- Coordinates Table -->
+            <div class="coordinates-container">
+                <h3>Selected Coordinates:</h3>
+                <table id="coordinates-table">
+                    <thead>
+                        <tr>
+                            <th>Latitude</th>
+                            <th>Longitude</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Coordinates will be inserted here dynamically -->
+                    </tbody>
+                </table>
+            </div>
 
-    <h3>Selected Coordinates:</h3>
-    <table id="coordinates-table">
-        <thead>
-            <tr>
-                <th>Latitude</th>
-                <th>Longitude</th>
-            </tr>
-        </thead>
-        <tbody></tbody>
-    </table>
+            <div id="hover-coordinates">Hover over the map to see coordinates...</div>
 
-    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+        </div>
 
-    <script>
-        var map = L.map('map').setView([25.0, 85.0], 5);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        }).addTo(map);
+        <!-- Right Panel: Map -->
+        <div class="right-panel">
+            <div id="map"></div>
+        </div>
+    </div>
 
-        var polygonLayer = L.layerGroup().addTo(map);
-        var points = [];
-        var polygon;
+    <!-- Plot Container -->
+    <div id="plot-container">
+        <div id="time-series-title"></div>
+        <div id="plot"></div>
+        <div id="spatial-plot-title"></div>
+    </div>
+<script>
+    // Initialize the map
+    var map = L.map('map').setView([25.0, 85.0], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
 
-        map.on('click', function(e) {
-            var lat = e.latlng.lat.toFixed(5);
-            var lon = e.latlng.lng.toFixed(5);
+    var polygonLayer = L.layerGroup().addTo(map);
+    var points = [];
+    var polygon;
 
-            points.push({ lat: lat, lon: lon });
-            updateCoordinatesTable();
+    // Map click handler to collect coordinates
+    map.on('click', function(e) {
+        var lat = e.latlng.lat.toFixed(5);
+        var lon = e.latlng.lng.toFixed(5);
 
-            if (points.length >= 3) {
-                var latlngs = points.map(p => [parseFloat(p.lat), parseFloat(p.lon)]);
-                if (polygon) {
-                    polygon.setLatLngs(latlngs);
-                } else {
-                    polygon = L.polygon(latlngs, { color: 'blue' }).addTo(polygonLayer);
-                }
+        points.push({ lat: lat, lon: lon });
+        updateCoordinatesTable(); // Update coordinates table
+
+        if (points.length >= 3) {
+            var latlngs = points.map(p => [parseFloat(p.lat), parseFloat(p.lon)]);
+            if (polygon) {
+                polygon.setLatLngs(latlngs);
+            } else {
+                polygon = L.polygon(latlngs, { color: 'blue' }).addTo(polygonLayer);
             }
+        }
+    });
 
-            document.getElementById('lat').value = lat;
-            document.getElementById('lon').value = lon;
+    // Function to update coordinates table
+    function updateCoordinatesTable() {
+        var tableBody = document.querySelector("#coordinates-table tbody");
+        tableBody.innerHTML = ""; // Clear previous rows
+
+        points.forEach(function(point) {
+            var row = document.createElement('tr');
+            var latCell = document.createElement('td');
+            latCell.textContent = point.lat;
+            var lonCell = document.createElement('td');
+            lonCell.textContent = point.lon;
+            row.appendChild(latCell);
+            row.appendChild(lonCell);
+            tableBody.appendChild(row);
         });
+    }
 
-        function updateCoordinatesTable() {
-            var tableBody = document.querySelector("#coordinates-table tbody");
-            tableBody.innerHTML = "";
+    // Display coordinates while hovering over the map
+    map.on('mousemove', function(e) {
+        var lat = e.latlng.lat.toFixed(5);
+        var lon = e.latlng.lng.toFixed(5);
+        document.getElementById('hover-coordinates').textContent = `Latitude: ${lat}, Longitude: ${lon}`;
+    });
 
-            points.forEach(function(point) {
-                var row = document.createElement('tr');
-                var latCell = document.createElement('td');
-                latCell.textContent = point.lat;
-                var lonCell = document.createElement('td');
-                lonCell.textContent = point.lon;
-                row.appendChild(latCell);
-                row.appendChild(lonCell);
-                tableBody.appendChild(row);
+    // Fetch data for time series
+    function fetchData() {
+        var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
+        var variable = document.getElementById('variable').value;
+        var model = document.getElementById('model').value;
+        var startDate = document.getElementById('start_date').value;
+        var endDate = document.getElementById('end_date').value;
+
+        var url = `/get_timeseries?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    var times = data.map(row => new Date(row.time));
+                    var values = data.map(row => row[variable]);
+
+                    var trace = {
+                        x: times,
+                        y: values,
+                        mode: 'lines',
+                        type: 'scatter',
+                        name: variable
+                    };
+
+                    var layout = {
+                        title: `${variable} Time Series (${model})`,
+                        xaxis: { title: 'Date' },
+                        yaxis: { title: variable }
+                    };
+
+                    document.getElementById('time-series-title').textContent = `${variable} Time Series (${model})`;
+
+                    Plotly.newPlot('plot', [trace], layout);
+
+                    document.getElementById('plot-container').style.visibility = 'visible';
+                } else {
+                    alert('No data available for the selected parameters.');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                alert('There was an error fetching the data.');
             });
-        }
+    }
 
-        // Function to handle showing/hiding the spatial plot button based on model selection
-        function toggleSpatialPlotButton() {
-            const model = document.getElementById('model').value;
-            const spatialPlotBtn = document.getElementById('spatial-plot-btn');
-            spatialPlotBtn.style.display = (model === 'CMIP6') ? 'inline' : 'none';
-        }
+   function getSpatialPlot() {
+    // Get the coordinates in the correct format
+    var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
+    var variable = document.getElementById('variable').value;
+    var model = document.getElementById('model').value;
+    var startDate = document.getElementById('start_date').value;
+    var endDate = document.getElementById('end_date').value;
 
-        // Function to fetch and display time series data
-        function fetchData() {
-            var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
-            var variable = document.getElementById('variable').value;
-            var model = document.getElementById('model').value;
-            var startDate = document.getElementById('start_date').value;
-            var endDate = document.getElementById('end_date').value;
+    // Construct the URL with a timestamp to avoid caching issues
+    var url = `/get_spatial_plot?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}&timestamp=${new Date().getTime()}`;
 
-            var url = `/get_timeseries?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}`;
+    // Fetch the image from the server
+    fetch(url)
+        .then(response => {
+            // Check if the response is OK (status 200)
+            if (!response.ok) {
+                throw new Error('Failed to fetch the spatial plot: ' + response.statusText);
+            }
+            return response.blob();  // Convert the response to a blob (image data)
+        })
+        .then(blob => {
+            // Create an image element from the blob response
+            var img = document.createElement('img');
+            img.src = URL.createObjectURL(blob);  // Convert the blob to an object URL
+            img.alt = "Spatial Plot";
+            img.style.width = "75%";  // Make sure the image scales properly
+            img.style.height = "auto";
 
-            fetch(url)
-                .then(response => response.json())
-                .then(data => {
-                    if (data && data.length > 0) {
-                        var times = data.map(row => new Date(row.time));
-                        var values = data.map(row => row[variable]);
+            // Clear previous content and append the new image
+            var container = document.getElementById('plot-container');
+            container.innerHTML = '';  // Clear any existing content
+            container.appendChild(img);
+            container.style.visibility = 'visible';  // Make sure the plot container is visible
+        })
+        .catch(error => {
+            // Handle any errors in fetching or displaying the plot
+            console.error('Error fetching spatial plot:', error);
+            alert('Error fetching spatial plot. Please try again later.');
+        });
+}
 
-                        var trace = {
-                            x: times,
-                            y: values,
-                            mode: 'lines',
-                            type: 'scatter'
-                        };
+    // Toggle Guide
+    function toggleGuide() {
+        var guide = document.getElementById('guideSection');
+        guide.style.display = guide.style.display === 'none' ? 'block' : 'none';
+    }
 
-                        var layout = {
-                            title: `${variable} Time Series (${model})`,
-                            xaxis: { title: 'Date' },
-                            yaxis: { title: variable }
-                        };
+    // Toggle visibility of spatial plot button based on model selection
+    function toggleSpatialPlotButton() {
+        var model = document.getElementById('model').value;
+        var spatialBtn = document.getElementById('spatial-plot-btn');
+        spatialBtn.style.display = model === 'CMIP6' ? 'inline-block' : 'none';
+    }
 
-                        Plotly.newPlot('plot', [trace], layout);
-                    } else {
-                        alert('No data available for the selected parameters.');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching data:', error);
-                });
-        }
+    // Download CSV of the time series data
+    function downloadCSV() {
+        var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
+        var variable = document.getElementById('variable').value;
+        var model = document.getElementById('model').value;
+        var startDate = document.getElementById('start_date').value;
+        var endDate = document.getElementById('end_date').value;
 
-        // Function to download data as CSV
-        function downloadCSV() {
-            var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
-            var variable = document.getElementById('variable').value;
-            var model = document.getElementById('model').value;
-            var startDate = document.getElementById('start_date').value;
-            var endDate = document.getElementById('end_date').value;
+        var url = `/download_csv?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}`;
 
-            var url = `/download_csv?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}`;
-            window.location.href = url;
-        }
+        window.location.href = url;
+    }
+</script>
 
-        // Function to fetch and display spatial plot
-        function getSpatialPlot() {
-            var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
-            var variable = document.getElementById('variable').value;
-            var model = document.getElementById('model').value;
-            var startDate = document.getElementById('start_date').value;
-            var endDate = document.getElementById('end_date').value;
-
-            var url = `/get_spatial_plot?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}`;
-
-            fetch(url)
-                .then(response => response.blob())
-                .then(imageBlob => {
-                    const imgElement = document.createElement('img');
-                    imgElement.src = URL.createObjectURL(imageBlob);
-                    document.getElementById('plot').innerHTML = '';
-                    document.getElementById('plot').appendChild(imgElement);
-                })
-                .catch(error => {
-                    console.error('Error fetching spatial plot:', error);
-                });
-        }
-    </script>
 </body>
 </html>
