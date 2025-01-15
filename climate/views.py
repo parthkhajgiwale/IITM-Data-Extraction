@@ -16,11 +16,47 @@ from django.conf import settings
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 import logging
+from django.shortcuts import render, redirect
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.models import User
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .forms import RegisterForm
 
 logger = logging.getLogger(__name__)
 plt.clf()
 # Database configuration
 DB_CONFIG = settings.DB_CONFIG
+
+def overview(request):
+    return render(request, 'overview.html')
+from django.shortcuts import render, redirect
+from django.contrib.auth import login
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from .forms import RegisterForm
+
+def register_view(request):
+    if request.method == 'POST':
+        form = RegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.first_name = form.cleaned_data.get('first_name')
+            user.last_name = form.cleaned_data.get('last_name')
+            user.save()
+            login(request, user)
+            messages.success(request, "Registration successful!")
+            return redirect('home')
+    else:
+        form = RegisterForm()
+    return render(request, 'register.html', {'form': form})
+
+@login_required
+def logout_view(request):
+    logout(request)
+    return redirect('login')
 
 def get_file_paths(variable, model):
     """Retrieve file paths for the given climate variable and model."""
@@ -48,14 +84,7 @@ def normalize_cftime_to_gregorian(time_array):
         else:
             converted_times.append(pd.Timestamp(t))  # Directly use Pandas for non-cftime objects
     return pd.to_datetime(converted_times)
-
-def home(request):
-    """Render the homepage with variable and model options."""
-    climate_variables = ['vas', 'tas', 'pr']
-    models = ['CMIP6', 'WAS-44i']
-    return render(request, 'index.html', {'climate_variables': climate_variables, 'models': models})
-
-
+@login_required
 def home(request):
     """Render the homepage with variable and model options."""
     climate_variables = ['vas', 'tas', 'pr']

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Climate Data Explorer</title>
+    <title>Register - Climate Data Explorer</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -122,7 +122,6 @@
         p a:hover {
             text-decoration: underline;
         }
-
     </style>
 </head>
 <body>
@@ -132,27 +131,39 @@
         <img src="https://upload.wikimedia.org/wikipedia/en/4/44/Indian_Institute_of_Tropical_Meteorology_Logo.png" alt="IITM Logo">
         <h1>Climate Data Explorer</h1>
         <div style="margin-left: auto;">
-            <a href="{% url 'register' %}">
-                <button>Register</button>
+            <a href="{% url 'login' %}">
+                <button>Login</button>
             </a>
         </div>
     </nav>
 
-    <!-- Login Form -->
+    <!-- Registration Form -->
     <div class="form-container">
         <div class="form-box">
-            <h2>Login</h2>
+            <h2>Register</h2>
             <form method="post">
                 {% csrf_token %}
                 <label for="id_username">Username:</label>
                 {{ form.username }}
 
-                <label for="id_password">Password:</label>
-                {{ form.password }}
+                <label for="id_first_name">First Name:</label>
+                {{ form.first_name }}
 
-                <button type="submit">Login</button>
+                <label for="id_last_name">Last Name:</label>
+                {{ form.last_name }}
+
+                <label for="id_email">Email:</label>
+                {{ form.email }}
+
+                <label for="id_password1">Password:</label>
+                {{ form.password1 }}
+
+                <label for="id_password2">Confirm Password:</label>
+                {{ form.password2 }}
+
+                <button type="submit">Register</button>
             </form>
-            <p>Don't have an account? <a href="{% url 'register' %}">Register</a></p>
+            <p>Already have an account? <a href="{% url 'login' %}">Login</a></p>
         </div>
     </div>
 </body>

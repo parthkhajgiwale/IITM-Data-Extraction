@@ -36,6 +36,10 @@ INSTALLED_APPS = [
     "climate",  # Your custom app
 ]
 
+PASSWORD_HASHERS = [
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',  # Uses SHA256 internally
+]
+
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
@@ -81,6 +85,17 @@ DB_CONFIG = {
     'password': 'password'
 }
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',  # Specify PostgreSQL engine
+        'NAME': DB_CONFIG['database'],              # Use the database from DB_CONFIG
+        'USER': DB_CONFIG['user'],                  # Use the user from DB_CONFIG
+        'PASSWORD': DB_CONFIG['password'],          # Use the password from DB_CONFIG
+        'HOST': DB_CONFIG['host'],                  # Use the host from DB_CONFIG
+        'PORT': '5432',                             # Default PostgreSQL port
+    }
+}
+
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -112,6 +127,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = "static/"
+
+LOGIN_URL = '/login/'  # Login redirect
+LOGIN_REDIRECT_URL = '/home/'  # Redirect after successful login
+LOGOUT_REDIRECT_URL = '/login/'  # Redirect after logout
 
 # Default primary key field type
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"

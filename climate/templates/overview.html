@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Climate Data Explorer - Overview</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.12.1/plotly.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* Navbar */
+        nav {
+            background-color: #094183;
+            padding: 10px;
+            color: white;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Logo styles */
+        nav img {
+            width: 60px;
+            height: auto;
+            margin-right: 15px;
+        }
+
+        nav h1 {
+            margin: 0;
+            font-size: 24px;
+            text-align: left;
+            flex-grow: 1;
+        }
+
+        nav button {
+            background-color: #094183;
+            color: white;
+            border: 2px solid white;
+            padding: 10px 20px;
+            cursor: pointer;
+            font-size: 14px;
+            border-radius: 5px;
+        }
+
+        nav button:hover {
+            color: #094183;
+            background-color: white;
+            border: 2px solid white;
+        }
+
+        /* Main content */
+        .content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .section {
+            background-color: #f9f9f9;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        .section h2 {
+            font-size: 22px;
+            margin-bottom: 15px;
+        }
+
+        .section p {
+            font-size: 16px;
+            line-height: 1.6;
+        }
+
+        .section ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .section li {
+            margin-bottom: 10px;
+        }
+
+        .cta-button {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .cta-button a {
+            text-decoration: none;
+            background-color: #094183;
+            color: white;
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+
+        .cta-button a:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Navbar -->
+    <nav>
+        <img src="https://upload.wikimedia.org/wikipedia/en/4/44/Indian_Institute_of_Tropical_Meteorology_Logo.png" alt="IITM Logo">
+        <h1>Climate Data Explorer</h1>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="content">
+        <!-- Introduction Section -->
+        <div class="section">
+            <h2>About the Climate Data Explorer</h2>
+            <p>
+                The Climate Data Explorer provides powerful tools for analyzing and visualizing climate data. This platform offers access to data from multiple climate models and scenarios, including South Asia CORDEX and CMIP6. You can explore various climate variables within a specific range, download CSV files, plot time series, and visualize spatial plots to gain insights into climate trends and patterns.
+            </p>
+        </div>
+
+        <!-- South Asia CORDEX Section -->
+        <div class="section">
+            <h2>South Asia CORDEX (WAS-44i)</h2>
+            <p>
+                The South Asia CORDEX (WAS-44i) dataset provides high-resolution climate data for South Asia. It includes a wide range of climate variables such as temperature, precipitation, and humidity across different time periods and regions. This dataset can be used for:
+            </p>
+            <ul>
+                <li>Analyzing climate trends in South Asia.</li>
+                <li>Comparing different climate scenarios and projections.</li>
+                <li>Extracting data for specific geographic locations.</li>
+            </ul>
+            <p>
+                You can download CSV data for climate variables within a selected range, and explore time series plots to analyze the data over time.
+            </p>
+        </div>
+
+        <!-- CMIP6 Section -->
+        <div class="section">
+            <h2>CMIP6 Climate Models</h2>
+            <p>
+                The CMIP6 (Coupled Model Intercomparison Project Phase 6) is a set of global climate models that provides simulations of future climate conditions. CMIP6 data helps scientists and researchers understand how different models predict climate variables under various future scenarios. With this tool, you can:
+            </p>
+            <ul>
+                <li>Access a wide variety of climate models from CMIP6.</li>
+                <li>Download CSV data for climate variables under different scenarios.</li>
+                <li>Visualize spatial plots to understand global climate patterns.</li>
+            </ul>
+        </div>
+
+        <!-- Features Section -->
+        <div class="section">
+            <h2>Key Features</h2>
+            <ul>
+                <li><strong>Download CSV:</strong> Download climate variable data in CSV format for analysis in other software tools.</li>
+                <li><strong>Time Series Plot:</strong> Plot time series graphs to visualize trends over time for specific climate variables.</li>
+                <li><strong>Spatial Plot:</strong> Generate spatial plots to visualize climate data across different geographic regions.</li>
+            </ul>
+        </div>
+
+        <!-- Call to Action Button -->
+        <div class="cta-button">
+            <a href="{% url 'login' %}">Start Exploring</a>
+        </div>
+    </div>
+</body>
+</html>

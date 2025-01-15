@@ -198,7 +198,13 @@
     <nav>
         <img src="https://upload.wikimedia.org/wikipedia/en/4/44/Indian_Institute_of_Tropical_Meteorology_Logo.png" alt="IITM Logo">
         <h1>Climate Data Explorer</h1>
-        <button id="logoutBtn">Logout</button>
+        <div style="margin-left: auto; display: flex; align-items: center; gap: 15px;">
+            <span>Welcome, {{ user.first_name }}</span>
+            <form method="post" action="{% url 'logout' %}">
+                {% csrf_token %}
+                <button id="logoutBtn">Logout</button>
+            </form>
+        </div>
     </nav>
 
     <!-- Main Content -->
