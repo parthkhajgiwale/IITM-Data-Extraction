@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Climate Data Explorer</title>
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/en/thumb/4/44/Indian_Institute_of_Tropical_Meteorology_Logo.png/220px-Indian_Institute_of_Tropical_Meteorology_Logo.png" type="image/gif" sizes="16x16">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/plotly.js/2.12.1/plotly.min.js"></script>
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
@@ -17,6 +18,44 @@
             height: 100vh;
         }
 
+        header {
+            background-color: #094183;
+            color: white;
+            display: flex;
+            justify-content:flex-start;
+            align-items: center;
+            padding: 10px 20px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            flex-wrap: wrap;
+            border-bottom: 2px solid gold;
+        }
+        h1 {
+            font-size: 18px;
+            margin: 0;
+            line-height: 1.2;
+            font-weight: bold;
+            flex-grow: 1;
+        }
+
+        .page-header-logo img {
+            width: 117px;
+            height: 117px;
+            margin-right: 20px;
+        }
+        .header-buttons {
+    display: flex;
+    flex-direction: row;  
+    justify-content: flex-end;  
+    align-items: center;  
+    margin-left: auto; 
+    margin-right: 40px;
+}
+
+
         /* Navbar */
         nav {
             background-color: #094183;
@@ -24,13 +63,7 @@
             color: white;
             display: flex;
             align-items: center;
-        }
-
-        /* Logo styles */
-        nav img {
-            width: 60px;
-            height: auto;
-            margin-right: 15px;
+            margin-top:140px;
         }
 
         nav h1 {
@@ -64,6 +97,7 @@
             padding: 20px;
             height: calc(100vh - 60px);
             flex: 1;
+            margin-top:10px;
         }
 
         /* Left Panel */
@@ -142,10 +176,10 @@
         }
 
         #map {
-            flex: 1;
-            border: 1px solid #ccc;
-            height: 100%;
-        }
+    position: relative;  
+    top: 10px;  
+    height: calc(100vh - 60px);  
+}
 
         /* Plot container */
         #plot-container {
@@ -179,8 +213,8 @@
         }
 
         .coordinates-container {
-            max-height: 200px; /* Limit height */
-            overflow-y: auto; /* Enable scrolling when coordinates are many */
+            max-height: 200px; 
+            overflow-y: auto; 
             margin-top: 20px;
         }
 
@@ -190,13 +224,40 @@
             font-size: 14px;
         }
 
+        /* Copyrights */
+        .copyright-section {
+            background-color: #094183; 
+            color: white; 
+            padding-bottom: 20px; 
+            padding-top: 40px;    
+            text-align: center; 
+            font-size: 14px; 
+            font-family: Arial, sans-serif; 
+        }
+
     </style>
 </head>
 <body>
 
+    <!--Header-->
+    <header>
+        <a class="page-header-logo" href="https://www.tropmet.res.in/" aria-label="IITM Home">
+            <img src="https://upload.wikimedia.org/wikipedia/en/thumb/4/44/Indian_Institute_of_Tropical_Meteorology_Logo.png/220px-Indian_Institute_of_Tropical_Meteorology_Logo.png" alt="Indian Institute of Tropical Meteorology" />
+        </a>
+        <h1>
+            <span style="font-size: 24px;">Indian Institute of Tropical Meteorology (IITM)<br>
+            <span style="font-size: 16px; font-style: italic;">Dr. Homi Bhabha Road,<br>Pashan, Pune – 411 008</span>
+        </h1>
+        <div class="header-buttons">
+            <a class="register-button" href="register.html" aria-label="Register">
+                <i class="fas fa-user-plus"></i>
+            </a>
+
+        </div>
+        
+    </header>
     <!-- Navbar -->
     <nav>
-        <img src="https://upload.wikimedia.org/wikipedia/en/4/44/Indian_Institute_of_Tropical_Meteorology_Logo.png" alt="IITM Logo">
         <h1>Climate Data Explorer</h1>
         <div style="margin-left: auto; display: flex; align-items: center; gap: 15px;">
             <span>Welcome, {{ user.first_name }}</span>
@@ -212,7 +273,7 @@
         <!-- Left Panel: Controls -->
         <div class="left-panel">
             <!-- Guide Section (Collapsible) -->
-            <button id="guide-toggle" onclick="toggleGuide()">Show Guide</button>
+            <button id="guide-toggle" onclick="toggleGuide()">User Guide</button>
             <div class="guide" id="guideSection" style="display: none;">
                 <h2>How to Use the Climate Data Explorer</h2>
                 <ul>
@@ -284,12 +345,21 @@
         <div id="plot"></div>
         <div id="spatial-plot-title"></div>
     </div>
+
+    <!-- Copyrights -->
+    <section class="copyright-section">
+        <p>&copy; 2025 Indian Institute of Tropical Meteorology. All Rights Reserved.</p>
+    </section>
+
 <script>
     // Initialize the map
-    var map = L.map('map').setView([25.0, 85.0], 5);
+    var map = L.map('map',{zoomControl:false}).setView([25.0, 85.0], 5);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
         attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
     }).addTo(map);
+    L.control.zoom({
+    position: 'bottomright'  
+}).addTo(map);
 
     var polygonLayer = L.layerGroup().addTo(map);
     var points = [];
@@ -428,6 +498,7 @@
     function toggleGuide() {
         var guide = document.getElementById('guideSection');
         guide.style.display = guide.style.display === 'none' ? 'block' : 'none';
+        
     }
 
     // Toggle visibility of spatial plot button based on model selection
@@ -449,6 +520,8 @@
 
         window.location.href = url;
     }
+
+    
 </script>
 
 </body>
