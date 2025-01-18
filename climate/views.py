@@ -29,8 +29,8 @@ plt.clf()
 # Database configuration
 DB_CONFIG = settings.DB_CONFIG
 
-def overview(request):
-    return render(request, 'overview.html')
+def base(request):
+    return render(request, 'base.html')
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm

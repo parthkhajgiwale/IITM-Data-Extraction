@@ -3,7 +3,7 @@ from django.contrib.auth.views import LoginView, LogoutView
 from . import views
 
 urlpatterns = [
-    path('', views.overview, name='overview'),
+    path('', views.base, name='base'),
     path('home/', views.home, name='home'),
     path('get_timeseries/', views.get_timeseries, name='get_timeseries'),
     path('download_csv/', views.download_csv, name='download_csv'),
