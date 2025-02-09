@@ -37,6 +37,8 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import RegisterForm
+from django.core.mail import send_mail
+
 
 def register_view(request):
     if request.method == 'POST':
@@ -45,9 +47,19 @@ def register_view(request):
             user = form.save(commit=False)
             user.first_name = form.cleaned_data.get('first_name')
             user.last_name = form.cleaned_data.get('last_name')
+            password = form.cleaned_data.get('password1')  # Get user's password
+            user.set_password(password)  # Hash password before saving
             user.save()
             login(request, user)
             messages.success(request, "Registration successful!")
+
+            subject = "Welcome to Our Platform!"
+            message = f"Hello {user.first_name},\n\nYour account has been created successfully.\n\nUsername: {user.username}\nPassword: {password}\n\nPlease change your password after logging in.\n\nBest regards,\nTeam"
+            from_email = settings.DEFAULT_FROM_EMAIL
+            recipient_list = [user.email]
+
+            send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+
             return redirect('home')
     else:
         form = RegisterForm()
