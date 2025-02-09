@@ -310,7 +310,7 @@
 
                 <button onclick="fetchData()">Plot Time Series</button>
                 <button onclick="downloadCSV()">Download CSV</button>
-                <button id="spatial-plot-btn" style="display: none;" onclick="getSpatialPlot()">Get Spatial Plot</button>
+                <button id="spatial-plot-btn" onclick="getSpatialPlot()">Get Spatial Plot</button>
             </div>
 
             <!-- Coordinates Table -->
@@ -505,7 +505,7 @@
     function toggleSpatialPlotButton() {
         var model = document.getElementById('model').value;
         var spatialBtn = document.getElementById('spatial-plot-btn');
-        spatialBtn.style.display = model === 'CMIP6' ? 'inline-block' : 'none';
+        //spatialBtn.style.display = model === 'CMIP6' ? 'inline-block' : 'none';
     }
 
     // Download CSV of the time series data
