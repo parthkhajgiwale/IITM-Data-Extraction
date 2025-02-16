@@ -228,66 +228,13 @@ def get_spatial_plot(request):
 def get_timeseries(request):
     """Fetch and return time-series data as JSON."""
     try:
-        # Extract request parameters
-        coordinates = request.GET.get('coordinates')
-        lat = request.GET.get('lat')
-        lon = request.GET.get('lon')
-        variable = request.GET.get('variable')
-        model = request.GET.get('model')
-        start_date = request.GET.get('start_date')
-        end_date = request.GET.get('end_date')
+        # Extract data using common function
+        time_series_df, error = extract_time_series_data(request)
+        if error:
+            return JsonResponse(error, status=400 if 'error' in error else 500)
 
-        # Validate required parameters
-        if not variable or not model or not start_date or not end_date:
-            return JsonResponse({'error': 'Variable, model, start date, and end date are required.'}, status=400)
-
-        # Retrieve file paths from the database
-        file_paths = get_file_paths(variable, model)
-        if not file_paths:
-            return JsonResponse({'error': f"No data available for the selected parameters: variable='{variable}', model='{model}'."}, status=404)
-
-        # Open dataset
-        datasets = xr.open_mfdataset(file_paths, combine='by_coords')
-
-        # Ensure the variable exists in the dataset
-        if variable not in datasets.variables:
-            return JsonResponse({'error': f"Variable '{variable}' not found in the dataset."}, status=400)
-
-        # Normalize time to Gregorian if cftime objects are used
-        if not pd.api.types.is_datetime64_any_dtype(datasets['time']):
-            datasets['time'] = normalize_cftime_to_gregorian(datasets['time'].values)
-
-        # Convert start_date and end_date to datetime
-        start_date_dt = datetime.strptime(start_date, "%Y-%m")
-        end_date_dt = datetime.strptime(end_date, "%Y-%m")
-
-        # Slice the dataset by time
-        time_filtered_data = datasets[variable].sel(time=slice(start_date_dt, end_date_dt))
-
-        # Handle point-based selection
-        if lat and lon:
-            lat, lon = float(lat), float(lon)
-            data = time_filtered_data.sel(lat=lat, lon=lon, method="nearest")
-
-        # Handle polygon-based regional average
-        elif coordinates:
-            coords = [tuple(map(float, coord.split(','))) for coord in coordinates.split(';')]
-            min_lat, max_lat = min(c[0] for c in coords), max(c[0] for c in coords)
-            min_lon, max_lon = min(c[1] for c in coords), max(c[1] for c in coords)
-            regional_data = time_filtered_data.sel(lat=slice(min_lat, max_lat), lon=slice(min_lon, max_lon))
-            data = regional_data.mean(dim=["lat", "lon"], skipna=True)
-
-        else:
-            return JsonResponse({'error': 'Please provide either lat/lon or region coordinates.'}, status=400)
-
-        # Ensure data is not empty
-        if data.size == 0:
-            return JsonResponse({'error': 'No data available for the selected time range or spatial coordinates.'}, status=404)
-
-        # Convert to DataFrame and normalize time
-        time_series_df = data.to_dataframe().reset_index()
-        time_series_df['time'] = pd.to_datetime(time_series_df['time'])
-        time_series_df['time'] = time_series_df['time'].dt.strftime('%Y-%m-%dT%H:%M:%S')
+        # Convert DataFrame time column to formatted string
+        time_series_df['time'] = pd.to_datetime(time_series_df['time']).dt.strftime('%Y-%m-%dT%H:%M:%S')
 
         # Return the time series data as JSON
         return JsonResponse(time_series_df.to_dict(orient='records'), safe=False)
@@ -296,8 +243,32 @@ def get_timeseries(request):
         print(f"Error occurred: {e}")
         return JsonResponse({'error': str(e)}, status=500)
 
+
 def download_csv(request):
-    """Fetch only required NetCDF files, extract time-series data, and return as CSV."""
+    """Fetch required NetCDF files, extract time-series data, and return as CSV."""
+    try:
+        # Extract data using common function
+        time_series_df, error = extract_time_series_data(request)
+        if error:
+            return JsonResponse(error, status=500)
+
+        # Create CSV response
+        csv_data = io.StringIO()
+        time_series_df.to_csv(csv_data, index=False)
+        csv_data.seek(0)
+
+        response = HttpResponse(csv_data, content_type='text/csv')
+        response['Content-Disposition'] = 'attachment; filename="climate_data.csv"'
+        return response
+
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
+def extract_time_series_data(request):
+    """
+    Extracts parameters from request, downloads required NetCDF files, 
+    processes time-series data, and returns a DataFrame.
+    """
     try:
         # Extract request parameters
         coordinates = request.GET.get('coordinates')
@@ -310,12 +281,12 @@ def download_csv(request):
 
         # Validate input
         if not variable or not model or not start_date or not end_date:
-            return JsonResponse({'error': 'Variable, model, start date, and end date are required.'}, status=400)
+            return None, {'error': 'Variable, model, start date, and end date are required.'}
 
-        # Get only the required file URLs based on time range
+        # Get required file URLs based on time range
         file_urls = get_filtered_file_urls(variable, model, start_date, end_date)
         if not file_urls:
-            return JsonResponse({'error': 'No files found for the selected variable, model, and time range.'}, status=404)
+            return None, {'error': 'No files found for the selected variable, model, and time range.'}
 
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_files = []
@@ -331,11 +302,12 @@ def download_csv(request):
                             f.write(chunk)
                     temp_files.append(temp_path)
                 else:
-                    return JsonResponse({'error': f'Failed to download {url}'}, status=500)
+                    return None, {'error': f'Failed to download {url}'}
 
-            # Open dataset with `decode_cf=False` to prevent file locking
+            # Open dataset with `decode_cf=True` to properly interpret time
             datasets = xr.open_mfdataset(temp_files, combine='by_coords', decode_cf=True, engine="netcdf4")
 
+            # Normalize time format
             datasets['time'] = normalize_cftime_to_gregorian(datasets['time'].values)
             time_filtered_data = datasets[variable].sel(time=slice(start_date, end_date))
 
@@ -352,22 +324,13 @@ def download_csv(request):
             # Convert data to DataFrame
             time_series_df = data.to_dataframe().reset_index()
 
-            # Explicitly close dataset before cleanup
+            # Close dataset
             datasets.close()
 
-        # Create CSV response
-        csv_data = io.StringIO()
-        time_series_df.to_csv(csv_data, index=False)
-        csv_data.seek(0)
-
-        response = HttpResponse(csv_data, content_type='text/csv')
-        response['Content-Disposition'] = 'attachment; filename="climate_data.csv"'
-        return response
+        return time_series_df, None  # Return DataFrame, no error
 
     except Exception as e:
-        return JsonResponse({'error': str(e)}, status=500)
-    
-
+        return None, {'error': str(e)}
 
 def get_filtered_file_urls(variable, model, start_date, end_date):
     """
