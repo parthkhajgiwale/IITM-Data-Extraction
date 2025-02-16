@@ -23,6 +23,9 @@ from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .forms import RegisterForm
+import tempfile
+import requests
+import os
 
 logger = logging.getLogger(__name__)
 plt.clf()
@@ -294,7 +297,7 @@ def get_timeseries(request):
         return JsonResponse({'error': str(e)}, status=500)
 
 def download_csv(request):
-    """Generate and return CSV data for download."""
+    """Fetch only required NetCDF files, extract time-series data, and return as CSV."""
     try:
         # Extract request parameters
         coordinates = request.GET.get('coordinates')
@@ -309,36 +312,85 @@ def download_csv(request):
         if not variable or not model or not start_date or not end_date:
             return JsonResponse({'error': 'Variable, model, start date, and end date are required.'}, status=400)
 
-        # Retrieve file paths
-        file_paths = get_file_paths(variable, model)
-        if not file_paths:
-            return JsonResponse({'error': 'No files found for the selected variable and model.'}, status=404)
+        # Get only the required file URLs based on time range
+        file_urls = get_filtered_file_urls(variable, model, start_date, end_date)
+        if not file_urls:
+            return JsonResponse({'error': 'No files found for the selected variable, model, and time range.'}, status=404)
 
-        # Open dataset and filter by time
-        datasets = xr.open_mfdataset(file_paths, combine='by_coords')
-        datasets['time'] = normalize_cftime_to_gregorian(datasets['time'].values)
-        time_filtered_data = datasets[variable].sel(time=slice(start_date, end_date))
+        with tempfile.TemporaryDirectory() as temp_dir:
+            temp_files = []
+            
+            # Download required NetCDF files
+            for url in file_urls:
+                temp_path = os.path.join(temp_dir, os.path.basename(url))
+                response = requests.get(url, stream=True, verify=False)
+                
+                if response.status_code == 200:
+                    with open(temp_path, 'wb') as f:
+                        for chunk in response.iter_content(chunk_size=8192):
+                            f.write(chunk)
+                    temp_files.append(temp_path)
+                else:
+                    return JsonResponse({'error': f'Failed to download {url}'}, status=500)
 
-        # Handle data selection (point or region)
-        if lat and lon:
-            lat, lon = float(lat), float(lon)
-            data = time_filtered_data.sel(lat=lat, lon=lon, method="nearest")
-        elif coordinates:
-            coords = [tuple(map(float, coord.split(','))) for coord in coordinates.split(';')]
-            min_lat, max_lat = min(c[0] for c in coords), max(c[0] for c in coords)
-            min_lon, max_lon = min(c[1] for c in coords), max(c[1] for c in coords)
-            data = time_filtered_data.sel(lat=slice(min_lat, max_lat), lon=slice(min_lon, max_lon))
+            # Open dataset with `decode_cf=False` to prevent file locking
+            datasets = xr.open_mfdataset(temp_files, combine='by_coords', decode_cf=True, engine="netcdf4")
 
-        # Convert data to a DataFrame
-        time_series_df = data.to_dataframe().reset_index()
+            datasets['time'] = normalize_cftime_to_gregorian(datasets['time'].values)
+            time_filtered_data = datasets[variable].sel(time=slice(start_date, end_date))
+
+            # Handle data selection (point or region)
+            if lat and lon:
+                lat, lon = float(lat), float(lon)
+                data = time_filtered_data.sel(lat=lat, lon=lon, method="nearest")
+            elif coordinates:
+                coords = [tuple(map(float, coord.split(','))) for coord in coordinates.split(';')]
+                min_lat, max_lat = min(c[0] for c in coords), max(c[0] for c in coords)
+                min_lon, max_lon = min(c[1] for c in coords), max(c[1] for c in coords)
+                data = time_filtered_data.sel(lat=slice(min_lat, max_lat), lon=slice(min_lon, max_lon))
+
+            # Convert data to DataFrame
+            time_series_df = data.to_dataframe().reset_index()
+
+            # Explicitly close dataset before cleanup
+            datasets.close()
 
         # Create CSV response
         csv_data = io.StringIO()
         time_series_df.to_csv(csv_data, index=False)
         csv_data.seek(0)
+
         response = HttpResponse(csv_data, content_type='text/csv')
         response['Content-Disposition'] = 'attachment; filename="climate_data.csv"'
         return response
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+    
+
+
+def get_filtered_file_urls(variable, model, start_date, end_date):
+    """
+    Fetch only URLs that match the required variable, model, and time range.
+    """
+    start_year = int(start_date.split('-')[0])
+    end_year = int(end_date.split('-')[0])
+    conn = None
+    try:
+        conn = psycopg2.connect(**DB_CONFIG)
+        cursor = conn.cursor()
+        query = """
+        SELECT file_path FROM climate_files
+        WHERE variable_name = %s AND model = %s
+        AND start_year <= %s AND end_year >= %s
+        """
+        params = (variable, model, end_year, start_year)
+        cursor.execute(query, params)
+        paths = [row[0] for row in cursor.fetchall()]
+        return paths
+    except Exception as e:
+        print(f"Error fetching file paths: {e}")
+        raise
+    finally:
+        if conn:
+            conn.close()
