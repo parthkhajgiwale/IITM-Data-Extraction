@@ -225,6 +225,7 @@
             border: 1px solid #ddd;
             visibility: hidden;  
             flex-grow: 1;
+            max-width: 100%;
         }
 
         #plot-container div {
@@ -418,7 +419,10 @@
 
 
     function showAlert(buttonId) {
-        alert(`Please ensure that the co-ordinates are selected on the Map!`);
+        if(points.length<3)
+        {
+            alert(`Please ensure that the co-ordinates are selected on the Map!`);
+        }
     }
 
     // List of button IDs
@@ -578,13 +582,6 @@
         var guide = document.getElementById('guideSection');
         guide.style.display = guide.style.display === 'none' ? 'block' : 'none';
         
-    }
-
-    // Toggle visibility of spatial plot button based on model selection
-    function toggleSpatialPlotButton() {
-        var model = document.getElementById('model').value;
-        var spatialBtn = document.getElementById('spatial-plot-btn');
-        spatialBtn.style.display = (model === 'CMIP6' || model === 'was') ? 'inline-block' : 'none';
     }
 
     // Download CSV of the time series data
