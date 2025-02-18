@@ -1,4 +1,5 @@
 import matplotlib
+
 matplotlib.use('Agg')  # Use the 'Agg' backend for headless environments
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
@@ -32,8 +33,11 @@ plt.clf()
 # Database configuration
 DB_CONFIG = settings.DB_CONFIG
 
+
 def base(request):
     return render(request, 'base.html')
+
+
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
@@ -68,10 +72,12 @@ def register_view(request):
         form = RegisterForm()
     return render(request, 'register.html', {'form': form})
 
+
 @login_required
 def logout_view(request):
     logout(request)
     return redirect('login')
+
 
 def get_file_paths(variable, model):
     """Retrieve file paths for the given climate variable and model."""
@@ -90,6 +96,7 @@ def get_file_paths(variable, model):
         if conn:
             conn.close()
 
+
 def normalize_cftime_to_gregorian(time_array):
     """Convert cftime objects to Gregorian calendar."""
     converted_times = []
@@ -99,11 +106,13 @@ def normalize_cftime_to_gregorian(time_array):
         else:
             converted_times.append(pd.Timestamp(t))  # Directly use Pandas for non-cftime objects
     return pd.to_datetime(converted_times)
+
+
 @login_required
 def home(request):
     """Render the homepage with variable and model options."""
     climate_variables = ['vas', 'tas', 'pr']
-    models = ['CMIP6', 'WAS-44i']
+    models = ['CMIP6', 'WAS-44I']
     return render(request, 'index.html', {'climate_variables': climate_variables, 'models': models})
 
 
@@ -131,16 +140,17 @@ def get_spatial_plot(request):
         file_urls = get_filtered_file_urls(variable, model, start_date, end_date)
         if not file_urls:
             logger.error("No files found for the selected variable, model, and time range.")
-            return JsonResponse({'error': 'No files found for the selected variable, model, and time range.'}, status=400)
+            return JsonResponse({'error': 'No files found for the selected variable, model, and time range.'},
+                                status=400)
 
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_files = []
-            
+
             # Download NetCDF files
             for url in file_urls:
                 temp_path = os.path.join(temp_dir, os.path.basename(url))
                 response = requests.get(url, stream=True, verify=False)
-                
+
                 if response.status_code == 200:
                     with open(temp_path, 'wb') as f:
                         for chunk in response.iter_content(chunk_size=8192):
@@ -224,6 +234,7 @@ def get_spatial_plot(request):
         logger.error(f"An error occurred: {str(e)}")
         return JsonResponse({"error": f"An error occurred: {str(e)}"}, status=500)
 
+
 def get_timeseries(request):
     """Fetch and return time-series data as JSON."""
     try:
@@ -262,10 +273,11 @@ def download_csv(request):
 
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
-    
+
+
 def extract_time_series_data(request):
     """
-    Extracts parameters from request, downloads required NetCDF files, 
+    Extracts parameters from request, downloads required NetCDF files,
     processes time-series data, and returns a DataFrame.
     """
     try:
@@ -289,12 +301,12 @@ def extract_time_series_data(request):
 
         with tempfile.TemporaryDirectory() as temp_dir:
             temp_files = []
-            
+
             # Download required NetCDF files
             for url in file_urls:
                 temp_path = os.path.join(temp_dir, os.path.basename(url))
                 response = requests.get(url, stream=True, verify=False)
-                
+
                 if response.status_code == 200:
                     with open(temp_path, 'wb') as f:
                         for chunk in response.iter_content(chunk_size=8192):
@@ -311,6 +323,7 @@ def extract_time_series_data(request):
             time_filtered_data = datasets[variable].sel(time=slice(start_date, end_date))
 
             # Handle data selection (point or region)
+            # Handle data selection (point or region)
             if lat and lon:
                 lat, lon = float(lat), float(lon)
                 data = time_filtered_data.sel(lat=lat, lon=lon, method="nearest")
@@ -318,7 +331,10 @@ def extract_time_series_data(request):
                 coords = [tuple(map(float, coord.split(','))) for coord in coordinates.split(';')]
                 min_lat, max_lat = min(c[0] for c in coords), max(c[0] for c in coords)
                 min_lon, max_lon = min(c[1] for c in coords), max(c[1] for c in coords)
-                data = time_filtered_data.sel(lat=slice(min_lat, max_lat), lon=slice(min_lon, max_lon))
+
+                # Select the region and compute spatial mean
+                data = time_filtered_data.sel(lat=slice(min_lat, max_lat), lon=slice(min_lon, max_lon)).mean(
+                dim=["lat", "lon"])
 
             # Convert data to DataFrame
             time_series_df = data.to_dataframe().reset_index()
@@ -330,6 +346,7 @@ def extract_time_series_data(request):
 
     except Exception as e:
         return None, {'error': str(e)}
+
 
 def get_filtered_file_urls(variable, model, start_date, end_date):
     """

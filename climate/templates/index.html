@@ -337,6 +337,7 @@
                 <strong style="color:red;background-color: yellow;">Note:<br> Please select the coordinates from the map for data exploration</strong>
             </div>
 
+
             <!-- Controls Section -->
             <div class="controls">
                 <label for="variable" style="font-family:'Times New Roman', Times, serif; font-size: 14px;">SELECT CLIMATE VARIABLE</label>
@@ -344,11 +345,12 @@
                     <option value="tas">Temperature (tas)</option>
                     <option value="vas">Wind Speed (vas)</option>
                     <option value="pr">Precipitation (pr)</option>
+                    <option value="uas">UAS</option>
                 </select>
 
                 <label for="model" style="font-family:'Times New Roman', Times, serif; font-size:14px;">SELECT MODEL</label>
                 <select id="model" onchange="toggleSpatialPlotButton()">
-                    <option value="WAS-44i">WAS-44i</option>
+                    <option value="WAS-44I">WAS-44i</option>
                     <option value="CMIP6">CMIP6</option>
                 </select>
 

@@ -1,10 +1,7 @@
 asciitree==0.3.3
 asgiref==3.8.1
 attrs==24.2.0
-beautifulsoup4==4.13.3
 Bottleneck==1.4.2
-bs4==0.0.2
-Cartopy==0.24.1
 certifi==2024.8.30
 cfgv==3.4.0
 cftime==1.6.4.post1
@@ -34,7 +31,6 @@ importlib_metadata==8.5.0
 importlib_resources==6.4.5
 iniconfig==2.0.0
 Jinja2==3.1.4
-joblib==1.4.2
 kaleido==0.2.1
 kiwisolver==1.4.7
 llvmlite==0.43.0
@@ -61,20 +57,16 @@ platformdirs==4.3.6
 plotly==5.24.1
 pluggy==1.5.0
 psutil==6.1.0
-psycopg2==2.9.10
 psycopg2-binary==2.9.10
 pyarrow==18.0.0
 pyarrow-hotfix==0.6
 pyparsing==3.2.0
-pyproj==3.7.0
-pyshp==2.3.1
 pytest==8.3.3
 python-dateutil==2.9.0.post0
 pytz==2024.2
 PyYAML==6.0.2
 requests==2.32.3
 ruff==0.7.3
-scikit-learn==1.6.1
 scipy==1.13.1
 shapely==2.0.6
 six==1.16.0
@@ -83,7 +75,6 @@ soupsieve==2.6
 sqlparse==0.5.1
 tblib==3.0.0
 tenacity==9.0.0
-threadpoolctl==3.5.0
 tomli==2.1.0
 toolz==1.0.0
 tornado==6.4.1
