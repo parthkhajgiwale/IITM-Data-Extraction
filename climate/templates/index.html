@@ -271,6 +271,18 @@
             font-family: Arial, sans-serif; 
         }
 
+        #progress-bar {
+            width: 100%;
+            background-color: #ddd;
+        }
+        #progress-fill {
+            width: 0%;
+            height: 30px;
+            background-color: #4CAF50;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -337,7 +349,11 @@
                 <strong style="color:red;background-color: yellow;">Note:<br> Please select the coordinates from the map for data exploration</strong>
             </div>
 
-
+            <div id="progress-bar">
+                <div id="progress-fill">0%</div>
+            </div>
+            <p id="progress-text">Waiting for progress...</p>
+        
             <!-- Controls Section -->
             <div class="controls">
                 <label for="variable" style="font-family:'Times New Roman', Times, serif; font-size: 14px;">SELECT CLIMATE VARIABLE</label>
@@ -599,7 +615,27 @@
         window.location.href = url;
     }
 
-    
+    function fetchProgress() {
+            fetch("/get_progress")
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("progress-text").innerText = data.progress;
+
+                    // Extract percentage from progress text (e.g., "Downloading file: 45%")
+                    let match = data.progress.match(/(\d+)%/);
+                    if (match) {
+                        let percent = parseInt(match[1]);
+                        document.getElementById("progress-fill").style.width = percent + "%";
+                        document.getElementById("progress-fill").innerText = percent + "%";
+                    }
+                })
+                .catch(() => {
+                    document.getElementById("progress-text").innerText = "Error fetching progress";
+                });
+        }
+
+        // Poll progress every 1 second
+        setInterval(fetchProgress, 10000);
 </script>
 
 </body>

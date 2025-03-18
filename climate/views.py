@@ -308,13 +308,21 @@ def extract_time_series_data(request):
                 response = requests.get(url, stream=True, verify=False)
 
                 if response.status_code == 200:
+                    total_size = int(response.headers.get('content-length', 0))
+                    downloaded = 0
+
                     with open(temp_path, 'wb') as f:
                         for chunk in response.iter_content(chunk_size=8192):
                             f.write(chunk)
+                            downloaded += len(chunk)
+                            progress_percent = int((downloaded / total_size) * 100)
+                            
+                            send_progress(f"Downloading {os.path.basename(url)}: {progress_percent}%")
                     temp_files.append(temp_path)
+                    
                 else:
+                    send_progress(f"Failed to download {url}")
                     return None, {'error': f'Failed to download {url}'}
-
             # Open dataset with `decode_cf=True` to properly interpret time
             datasets = xr.open_mfdataset(temp_files, combine='by_coords', decode_cf=True, engine="netcdf4")
 
@@ -373,3 +381,15 @@ def get_filtered_file_urls(variable, model, start_date, end_date):
     finally:
         if conn:
             conn.close()
+
+
+from django.core.cache import cache
+
+def send_progress(progress):
+    cache.set("download_progress", progress, timeout=60)  # Store progress for 60 seconds
+
+from django.http import JsonResponse
+
+def get_progress(request):
+    progress = cache.get("download_progress", "No progress yet")
+    return JsonResponse({"progress": progress})
