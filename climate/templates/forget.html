@@ -187,10 +187,10 @@
     <div class="form-container">
         <div class="form-box">
             <h2>Forgot Password</h2>
-            <form method="post">
+            <form method="post" action="{% url 'password_reset' %}">
                 {% csrf_token %}
                 <label for="id_email">Email Address:</label>
-                {{ form.email }}
+                <input type="email" id="email" name="email" placeholder="Enter your email" required>
 
                 <button type="submit">Submit</button>
             </form>

@@ -352,23 +352,30 @@
             <div id="progress-bar">
                 <div id="progress-fill">0%</div>
             </div>
-            <p id="progress-text">Waiting for progress...</p>
+            <p id="progress-text"></p>
         
             <!-- Controls Section -->
             <div class="controls">
-                <label for="variable" style="font-family:'Times New Roman', Times, serif; font-size: 14px;">SELECT CLIMATE VARIABLE</label>
-                <select id="variable">
-                    <option value="tas">Temperature (tas)</option>
-                    <option value="vas">Wind Speed (vas)</option>
-                    <option value="pr">Precipitation (pr)</option>
-                    <option value="uas">UAS</option>
-                </select>
 
                 <label for="model" style="font-family:'Times New Roman', Times, serif; font-size:14px;">SELECT MODEL</label>
-                <select id="model" onchange="toggleSpatialPlotButton()">
+                <select id="model" onchange="toggleOptions()">
                     <option value="WAS-44I">WAS-44i</option>
                     <option value="CMIP6">CMIP6</option>
                 </select>
+
+                <label for="variable" style="font-family:'Times New Roman', Times, serif; font-size: 14px;">SELECT CLIMATE VARIABLE</label>
+                <select id="variable">
+                    <option value="clt">Total Cloud Cover (clt)</option>
+                    <option value="pr">Precipitation (pr)</option>
+                    <option value="ta" id="ta-option" disabled>Air Temperature (ta)</option>
+                    <option value="tas">Surface Air Temperature (tas)</option>
+                    <option value="ua" id="ua-option" disabled>Zonal Wind (ua)</option>
+                    <option value="uas">Surface Zonal Wind (uas)</option>
+                    <option value="va" id="va-option" disabled>Meridional Wind (va)</option>
+                    <option value="vas">Surface Meridional Wind (vas)</option>
+                </select>
+
+                
 
                 <label for="start_date" style="font-family:'Times New Roman', Times, serif; font-size:14px;">START DATE</label>
                 <input type="month" id="start_date">
@@ -545,7 +552,7 @@
 
                     document.getElementById('plot-container').style.visibility = 'visible';
                 } else {
-                    alert('No data available for the selected parameters.');
+                    //alert('No data available for the selected parameters.');
                 }
             })
             .catch(error => {
@@ -613,6 +620,23 @@
         var url = `/download_csv?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}`;
 
         window.location.href = url;
+    }
+
+    function toggleOptions() {
+        var model = document.getElementById("model").value;
+        var vaOption = document.getElementById("va-option");
+        var uaOption = document.getElementById("ua-option");
+        var taOption = document.getElementById("ta-option");
+
+        if (model === "CMIP6") {
+            vaOption.disabled = false;  // Enable the option
+            uaOption.disabled = false;  // Enable the option
+            taOption.disabled = false;
+        } else {
+            vaOption.disabled = true;   // Disable the option
+            uaOption.disabled = true;   // Disable the option
+            taOption.disabled = true;
+        }
     }
 
     function fetchProgress() {
