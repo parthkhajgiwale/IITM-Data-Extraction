@@ -355,6 +355,28 @@ def extract_time_series_data(request):
     except Exception as e:
         return None, {'error': str(e)}
 
+from django.shortcuts import render
+from .models import ClimateFile
+
+def climate_files_view(request, model_type):
+    # Filter records by model type
+    files = ClimateFile.objects.filter(model=model_type)
+
+    # Get distinct variable names for sidebar
+    all_variables = ClimateFile.objects.values_list('variable_name', flat=True).distinct()
+
+    # Apply filter if a variable is selected
+    selected_vars = request.GET.getlist('variable')
+    if selected_vars:
+        files = files.filter(variable_name__in=selected_vars)
+
+    context = {
+        'climate_files': files,
+        'all_variables': all_variables,
+        'selected_vars': selected_vars,
+        'model_type': model_type,
+    }
+    return render(request, 'climate_files_table.html', context)
 
 def get_filtered_file_urls(variable, model, start_date, end_date):
     """

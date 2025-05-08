@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Climate Files - {{ model_type }}</title>
+    <style>
+        .container {
+            display: flex;
+            margin: 20px;
+        }
+        .sidebar {
+            width: 200px;
+            padding: 10px;
+            background: #f4f4f4;
+        }
+        .sidebar h3 {
+            margin-top: 0;
+        }
+        .table-container {
+            flex: 1;
+            padding: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        th, td {
+            padding: 8px;
+            border: 1px solid #ddd;
+        }
+        th {
+            background: #eee;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Climate Files for Model: {{ model_type }}</h1>
+
+<div class="container">
+    <div class="sidebar">
+        <h3>Filter by Variable</h3>
+        <form method="get">
+            {% for var in all_variables %}
+                <div>
+                    <input type="checkbox" name="variable" value="{{ var }}"
+                           {% if var in selected_vars %}checked{% endif %}>
+                    <label>{{ var }}</label>
+                </div>
+            {% endfor %}
+            <button type="submit">Apply</button>
+        </form>
+    </div>
+
+    <div class="table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Variable Name</th>
+                    <th>File Name</th>
+                    <th>Frequency</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for file in climate_files %}
+                    <tr>
+                        <td>{{ file.variable_name }}</td>
+                        <td><a href="{{ file.file_path }}" target="_blank">{{ file.file_name }}</a></td>
+                        <td>{{ file.frequency}}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="3">No files found for this model/variable.</td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>
