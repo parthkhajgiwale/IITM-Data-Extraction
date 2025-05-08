@@ -1,7 +1,6 @@
 from django.urls import path
 from django.contrib.auth.views import LoginView, LogoutView
 from . import views
-from .views import climate_files_view
 from django.contrib.auth import views as auth_views
 
 
@@ -19,6 +18,6 @@ urlpatterns = [
     path('reset/<uidb64>/<token>/', auth_views.PasswordResetConfirmView.as_view(), name='password_reset_confirm'),
     path('reset/done/', auth_views.PasswordResetCompleteView.as_view(), name='password_reset_complete'),
     path("get_progress/", views.get_progress, name="get_progress"),
-    path('climate-files/<str:model_type>/', climate_files_view, name='climate_files'),
+    path('forget/', views.forget_password_view, name='forget_password'),
 
 ]
