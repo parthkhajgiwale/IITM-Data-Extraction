@@ -1,0 +1,488 @@
+{% load static %}
+<!DOCTYPE html>
+<html dir="ltr" lang="en-US">
+<head>
+
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="x-ua-compatible" content="IE=edge">
+	<meta name="author" content="APN">
+
+	<!-- Font Imports -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+	<link href="https://cdn.jsdelivr.net/npm/@iconscout/unicons/css/line.css" rel="stylesheet">
+
+
+
+	<!-- Core Style -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- Font Icons -->
+    <link rel="stylesheet" href="{% static 'css/font-icons.css' %}">
+
+    <!-- Plugins/Components CSS -->
+    <link rel="stylesheet" href="{% static 'css/datepicker.css' %}">
+
+    <!-- Niche Demos -->
+    <link rel="stylesheet" href="{% static 'css/niche.css' %}">
+
+    <!-- Custom Demos -->
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<!-- Document Title
+	============================================= -->
+	<title>Home | Data Explorer</title>
+
+</head>
+
+<body class="stretched">
+
+	<!-- Document Wrapper
+	============================================= -->
+	<div id="wrapper">
+
+		<!-- Header
+		============================================= -->
+		<header id="header" class="dark header-size-sm" data-sticky-shrink="false">
+			<div class="container">
+				<div class="header-row">
+
+					<!-- Logo
+					============================================= -->
+					<div id="logo" class="ms-auto ms-md-0">
+						<a href="{% url 'home' %}">
+							<img class="logo-default" src="http://cccr.tropmet.res.in/home/images/CCCR_logo.png" alt="CCCR Logo" > </a>
+						</a>
+						<h5>Center for Climate Change and Research</h5>
+					</div><!-- #logo end -->
+
+					<ul class="header-extras d-none d-sm-flex mx-auto mx-md-0 mb-4 mb-md-0">
+						<li>
+							<i class="i-plain bi-telephone m-0"></i>
+							<div class="he-text fw-normal text-white-50">
+								Call Us:
+								<span><a href="tel:+91(020) 25904200" class="text-white fw-medium">+91(020) 25904200</a></span>
+							</div>
+						</li>
+						<li>
+							<i class="i-plain bi-envelope m-0"></i>
+							<div class="he-text fw-normal text-white-50">
+								Email Us:
+								<span><a href="mailto:info@tropmet.in" target="_top" class="text-white fw-medium">info@tropmet.in</a></span>
+							</div>
+						</li>
+					</ul>
+
+				</div>
+			</div>
+
+			<div id="header-wrap">
+				<div class="container">
+					<div class="header-row justify-content-between flex-row-reverse flex-lg-row">
+
+						<div class="header-misc">
+
+							<!-- Header Buttons
+							============================================= -->
+							<div class="header-buttons d-none d-sm-inline-block">
+								<a href="{% url 'login' %}" data-scrollto="#slider" data-offset="-80" class="button button-rounded button-white button-light button-small m-0">Login</a>
+							</div>
+
+						</div>
+
+
+						<!-- Primary Navigation
+						============================================= -->
+						<nav class="primary-menu with-arrows">
+
+							<ul class="menu-container">
+								<li class="menu-item current"><a class="menu-link" href="{% url 'home' %}"><div>Home</div></a></li>
+								<li class="menu-item"><a class="menu-link" href="#datasets"><div>Dataset</div></a>
+									<ul class="sub-menu-container" data-class="up-lg:not-dark">
+										<li class="menu-item"><a class="menu-link" href="{% url 'cmip6' %}"><div><i class="bi-database"></i>CMIP6</div></a></li>
+										<li class="menu-item"><a class="menu-link" href="{% url 'cordex' %}"><div><i class="bi-database"></i>CORDEX</div></a></li>
+										<li class="menu-item"><a class="menu-link" href="{% url 'cmip7' %}"><div><i class="bi-database"></i>CMIP7</div></a></li>
+									</ul>
+								</li>
+								<li class="menu-item"><a class="menu-link" href="{% url 'faq' %}"><div>FAQs</div></a></li>
+								<li class="menu-item"><a class="menu-link" href="{% url 'login' %}"><div>Explore</div></a></li>
+								<li class="menu-item"><a class="menu-link" href="{% url 'contact' %}"><div>Contact Us</div></a></li>
+							</ul>
+
+						</nav><!-- #primary-menu end -->
+
+					</div>
+				</div>
+			</div>
+			<div class="header-wrap-clone"></div>
+		</header><!-- #header end -->
+
+		<!-- Slider
+		============================================= -->
+		<section id="slider" class="slider-element bg-color" style="height: auto; padding: 60px 0; background: url('demos/movers/images/bg-2.png') no-repeat center center / 100% 100%;">
+
+			<div class="container mt-4" style="z-index: 2">
+				<div class="text-center">
+					<h2 class="text-white h2 fw-semibold mb-2">Welcome to the Climate Data Explorer</h2>
+					<p class="text-white-50">"Unlocking Insights from CMIP6 and CORDEX for Forecasting and Climate Trend Analysis Across Key Environmental Variables"</p>
+				</div>	
+			</div>
+
+			<div class="svg-separator">
+				<div>
+					<svg preserveAspectRatio="xMidYMax meet" viewBox="0 0 1600 100" data-height="100">
+						<path style="opacity: 1;fill: rgba(255,255,255,0.75);" d="M1040,56c0.5,0,1,0,1.6,0c-16.6-8.9-36.4-15.7-66.4-15.7c-56,0-76.8,23.7-106.9,41C881.1,89.3,895.6,96,920,96
+						C979.5,96,980,56,1040,56z"></path> <path style="opacity: 1;fill: rgba(255,255,255,0.75);" d="M1699.8,96l0,10H1946l-0.3-6.9c0,0,0,0-88,0s-88.6-58.8-176.5-58.8c-51.4,0-73,20.1-99.6,36.8 c14.5,9.6,29.6,18.9,58.4,18.9C1699.8,96,1699.8,96,1699.8,96z"></path> <path style="opacity: 1;fill: rgba(255,255,255,0.75);" d="M1400,96c19.5,0,32.7-4.3,43.7-10c-35.2-17.3-54.1-45.7-115.5-45.7c-32.3,0-52.8,7.9-70.2,17.8 c6.4-1.3,13.6-2.1,22-2.1C1340.1,56,1340.3,96,1400,96z"></path> <path style="opacity: 1;fill: rgba(255,255,255,0.75);" d="M320,56c6.6,0,12.4,0.5,17.7,1.3c-17-9.6-37.3-17-68.5-17c-60.4,0-79.5,27.8-114,45.2 c11.2,6,24.6,10.5,44.8,10.5C260,96,259.9,56,320,56z"></path> <path style="opacity: 1;fill: rgba(255,255,255,0.75);" d="M680,96c23.7,0,38.1-6.3,50.5-13.9C699.6,64.8,679,40.3,622.2,40.3c-30,0-49.8,6.8-66.3,15.8 c1.3,0,2.7-0.1,4.1-0.1C619.7,56,620.2,96,680,96z"></path> <path style="opacity: 1;fill: rgba(255,255,255,0.75);" d="M-40,95.6c28.3,0,43.3-8.7,57.4-18C-9.6,60.8-31,40.2-83.2,40.2c-14.3,0-26.3,1.6-36.8,4.2V106h60V96L-40,95.6
+						z"></path>
+						<path style="opacity: 1;fill: rgba(255,255,255,0.3);;" d="M504,73.4c-2.6-0.8-5.7-1.4-9.6-1.4c-19.4,0-19.6,13-39,13c-19.4,0-19.5-13-39-13c-14,0-18,6.7-26.3,10.4 C402.4,89.9,416.7,96,440,96C472.5,96,487.5,84.2,504,73.4z"></path> <path style="opacity: 1;fill: rgba(255,255,255,0.3);;" d="M1205.4,85c-0.2,0-0.4,0-0.6,0c-19.5,0-19.5-13-39-13s-19.4,12.9-39,12.9c0,0-5.9,0-12.3,0.1 c11.4,6.3,24.9,11,45.5,11C1180.6,96,1194.1,91.2,1205.4,85z"></path> <path style="opacity: 1;fill: rgba(255,255,255,0.3);;" d="M1447.4,83.9c-2.4,0.7-5.2,1.1-8.6,1.1c-19.3,0-19.6-13-39-13s-19.6,13-39,13c-3,0-5.5-0.3-7.7-0.8 c11.6,6.6,25.4,11.8,46.9,11.8C1421.8,96,1435.7,90.7,1447.4,83.9z"></path> <path style="opacity: 1;fill: rgba(255,255,255,0.3);;" d="M985.8,72c-17.6,0.8-18.3,13-37,13c-19.4,0-19.5-13-39-13c-18.2,0-19.6,11.4-35.5,12.8 c11.4,6.3,25,11.2,45.7,11.2C953.7,96,968.5,83.2,985.8,72z"></path> <path style="opacity: 1;fill: rgba(255,255,255,0.3);;" d="M743.8,73.5c-10.3,3.4-13.6,11.5-29,11.5c-19.4,0-19.5-13-39-13s-19.5,13-39,13c-0.9,0-1.7,0-2.5-0.1 c11.4,6.3,25,11.1,45.7,11.1C712.4,96,727.3,84.2,743.8,73.5z"></path> <path style="opacity: 1;fill: rgba(255,255,255,0.3);;" d="M265.5,72.3c-1.5-0.2-3.2-0.3-5.1-0.3c-19.4,0-19.6,13-39,13c-19.4,0-19.6-13-39-13 c-15.9,0-18.9,8.7-30.1,11.9C164.1,90.6,178,96,200,96C233.7,96,248.4,83.4,265.5,72.3z"></path> <path style="opacity: 1;fill: rgba(255,255,255,0.3);;" d="M1692.3,96V85c0,0,0,0-19.5,0s-19.6-13-39-13s-19.6,13-39,13c-0.1,0-0.2,0-0.4,0c11.4,6.2,24.9,11,45.6,11 C1669.9,96,1684.8,96,1692.3,96z"></path> <path style="opacity: 1;fill: rgba(255,255,255,0.3);;" d="M25.5,72C6,72,6.1,84.9-13.5,84.9L-20,85v8.9C0.7,90.1,12.6,80.6,25.9,72C25.8,72,25.7,72,25.5,72z"></path>
+						<path style="fill: rgb(255, 255, 255);" d="M-40,95.6C20.3,95.6,20.1,56,80,56s60,40,120,40s59.9-40,120-40s60.3,40,120,40s60.3-40,120-40s60.2,40,120,40s60.1-40,120-40s60.5,40,120,40s60-40,120-40s60.4,40,120,40s59.9-40,120-40s60.3,40,120,40s60.2-40,120-40s60.2,40,120,40s59.8,0,59.8,0l0.2,143H-60V96L-40,95.6z"></path>
+					</svg>
+					<div class="bg-white" style="height: 1px"></div>
+				</div>
+			</div>
+
+		</section>
+
+		<!-- Content
+		============================================= -->
+		<section id="content">
+
+			<div class="content-wrap pb-0">
+
+				<div class="container">
+
+					<div class="row justify-content-center mb-5">
+						<div class="col-lg-7 text-center">
+							<div class="heading-block">
+								<h3 class="text-transform-none mb-3 fw-semibold ls-0">How Does It Work</h3>
+								<span class="text-black-50">From Global Models to Local Insights — See How We Transform Raw Climate Data into Actionable Intelligence!</span>
+							</div>
+						</div>
+
+						<div class="col-lg-8">
+							<div class="row align-items-center">
+								<div class="col-sm-6">
+									<img src="{% static 'images/step1.png' %}" alt="Step 1">
+								</div>
+								<div class="col-sm-6">
+									<h3>Select the Data Source</h3>
+									<p class="mb-2">Choose from <b>CMIP6 or CORDEX</b> datasets, emission scenarios (e.g., SSP2-4.5, SSP5-8.5), and climate models relevant to your region.</p>
+								</div>
+							</div>
+							<div class="row align-items-center mt-5">
+								<div class="col-sm-6 mb-4 mb-sm-0">
+									<h3>Choose a Variable &amp; Timeframe</h3>
+									<p class="mb-2">Pick climate variables like temperature, precipitation, humidity, etc., and define historical periods for analysis.</p>
+								</div>
+								<div class="col-sm-6">
+									<img src="{% static 'images/step2.png' %}" alt="Step 2">
+								</div>
+							</div>
+							<div class="row align-items-center mt-5">
+								<div class="col-sm-6">
+									<img src="{% static 'images/step3.png' %}" alt="Step 3">
+								</div>
+								<div class="col-sm-6">
+									<h3>Visualize &amp; Analyze</h3>
+									<p class="mb-2">Generate interactive maps, graphs, and trend lines to explore patterns, make comparisons, and support decision-making</p>
+								</div>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+				<div class="clear"></div>
+
+				<div id="datasets"></div>
+				<div class="d-flex justify-content-center align-items-center min-vh-40"  >
+					<div class="col-lg-7 text-center">
+						<div class="heading-block" >
+							<h3 class="text-transform-none mb-3 fw-semibold ls-0">Datasets</h3>
+							<span class="text-black-50">"Harness the Power of Climate Data for In-Depth Analysis and Forecasting."</span>
+						</div>
+					</div>
+				</div>
+				<div class="section section-features bg-transparent mt-0 p-0">
+					<div class="container">
+						<div class="row col-mb-50 col-mb-lg-80">
+							<div class="col-md-4">
+								<div class="feature-box media-box">
+									<div class="fbox-icon position-relative mb-4">
+										<i class="bi-database"></i>
+									</div>
+									<div class="fbox-content">
+										<h3 class="fw-semibold"><a href="{% url 'cmip6' %}">CMIP6</a></h3>
+										<p class="text-muted">CMIP6 provides crucial global climate projections from multiple models, supporting climate research and policy by offering data on temperature, precipitation, and more under various emission scenarios.</p>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="feature-box media-box">
+									<div class="fbox-icon position-relative mb-4">
+										<i class="bi-database"></i>
+									</div>
+									<div class="fbox-content">
+										<h3 class="fw-semibold"><a href="{% url 'cordex' %}">CORDEX</a></h3>
+										<p class="text-muted">CORDEX focuses on regional climate downscaling, providing high-resolution climate projections tailored to specific regions, helping to assess local climate impacts and inform adaptation strategies.</p>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-4">
+								<div class="feature-box media-box">
+									<div class="fbox-icon position-relative mb-4">
+										<i class="bi-database"></i>
+									</div>
+									<div class="fbox-content">
+										<h3 class="fw-semibold"><a href="{% url 'cmip7' %}">CMIP7</a></h3>
+										<p class="text-muted">CMIP7, the next phase of the project, will enhance climate modeling capabilities, providing more accurate and detailed future climate scenarios to support global climate assessments and informed policy decisions.</p>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+
+				<div class="clear"></div>
+
+				
+				<div class="clear"></div>
+
+				<div class="section section-gradient m-0">
+					<div class="svg-separator top rotate">
+						<div>
+							 <svg preserveAspectRatio="xMidYMax meet" class="svg-separator sep3" viewBox="0 0 1600 100">
+								<path style="opacity: 1;fill: #FFF;" d="M-40,71.627C20.307,71.627,20.058,32,80,32s60.003,40,120,40s59.948-40,120-40s60.313,40,120,40s60.258-40,120-40s60.202,40,120,40s60.147-40,120-40s60.513,40,120,40s60.036-40,120-40c59.964,0,60.402,40,120,40s59.925-40,120-40s60.291,40,120,40s60.235-40,120-40s60.18,40,120,40s59.82,0,59.82,0l0.18,26H-60V72L-40,71.627z"></path>
+								<path class="svg-themecolor" style="opacity: 0.1;" d="M-40,83.627C20.307,83.627,20.058,44,80,44s60.003,40,120,40s59.948-40,120-40s60.313,40,120,40s60.258-40,120-40s60.202,40,120,40s60.147-40,120-40s60.513,40,120,40s60.036-40,120-40c59.964,0,60.402,40,120,40s59.925-40,120-40s60.291,40,120,40s60.235-40,120-40s60.18,40,120,40s59.82,0,59.82,0l0.18,14H-60V84L-40,83.627z"></path>
+								<path style="fill: #FFF;" d="M-40,95.627C20.307,95.627,20.058,56,80,56s60.003,40,120,40s59.948-40,120-40s60.313,40,120,40s60.258-40,120-40s60.202,40,120,40s60.147-40,120-40s60.513,40,120,40s60.036-40,120-40c59.964,0,60.402,40,120,40s59.925-40,120-40s60.291,40,120,40s60.235-40,120-40s60.18,40,120,40s59.82,0,59.82,0l0.18,138H-60V96L-40,95.627z"></path>
+							</svg>
+						</div>
+					</div>
+					<div class="container">
+						<div class="mx-auto mw-lg" style="padding: 120px 0 50px;">
+							<div class="d-flex justify-content-between align-items-center mb-4 dark">
+								<h3 class="mb-0">Developers Documentation</h3>
+								<a href="#" class="button button-white button-light button-rounded button-small fw-medium m-0">View More</a>
+							</div>
+							<div class="row row-eq-height justify-content-center">
+								<div class="col-md-6">
+									<div class="bg-white shadow-sm d-flex justify-content-center flex-column rounded">
+										<div class="d-flex flex-row mb-4 align-items-center">
+											<a href="#"><img class="rounded-circle" src="{% static 'images/step3.png' %}" alt="Customer Testimonails" width="80" height="80"></a>
+											<h4 class="ms-3 mb-0">John Doe</h4>
+										</div>
+										<div class="border-start border-width-3 ps-4">
+											<h4 class="mb-4 fw-normal">Assertively leverage existing integrated communities after turnkey quality vectors. Assertively coordinate sustainable quality vectors and pandemic markets. Assertively leverage existing integrated communities.</h4>
+											<div class="h6 text-uppercase fw-bold ls-1">- Fig Nelson</div>
+										</div>
+									</div>
+								</div>
+								<div class="col-md-6 mt-3 mt-md-0">
+									<div class="bg-white shadow-sm d-flex justify-content-center flex-column mb-3 rounded p-5">
+										<div class="border-start border-width-3 ps-4">
+											<p class="mb-4">Incidunt deleniti blanditiis quas aperiam recusandae consequatur ullam quibusdam cum libero illo rerum repellendus!</p>
+											<div class="h6 text-uppercase fw-bold ls-1">- Fig Nelson</div>
+										</div>
+									</div>
+									<div class="bg-white shadow-sm d-flex justify-content-center flex-column rounded p-5">
+										<div class="border-start border-width-3 ps-4">
+											<p>Incidunt deleniti blanditiis quas aperiam recusandae consequatur ullam quibusdam cum libero illo rerum repellendus!</p>
+											<div class="h6 text-uppercase fw-bold ls-1">- Fig Nelson</div>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				
+				<div class="clear"></div>
+
+				<div class="section dark pt-0 mb-0 bg-color" style="background: url('demos/movers/images/bg-2.png') no-repeat center bottom / 100%; overflow: visible">
+					<svg viewBox="0 0 1960 206.8" class="bg-white">
+						<path class="svg-themecolor" style="opacity:0.2;" d="M0,142.8A2337.49,2337.49,0,0,1,297.5,56.3C569.33-3.53,783.89.22,849.5,2.3c215.78,6.86,382.12,45.39,503.25,73.45,158.87,36.8,283.09,79.13,458.75,54.55A816.49,816.49,0,0,0,1983,86.8v110H0Z"></path>
+						<path class="svg-themecolor" d="M.5,152.8s498-177,849-150,1031,238,1134,94v110H.5Z"></path>
+					</svg>
+					<div class="container">
+						<div class="row align-items-center justify-content-center text-center my-4">
+
+							<div class="col-sm-8">
+								<div class="heading-block border-bottom-0 mb-4">
+									<h2 class="fw-semibold ls-0 text-transform-none mb-3" style="font-size: 44px; line-height: 1.3">Contact Us</h2>
+									<p>Reach out to us for support, data inquiries, or collaborations — your insights drive better climate solutions.</p>
+								</div>
+								<a href="{% url 'contact' %}" class="button button-white button-light button-rounded fw-medium m-0">Get In Touch</a>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</section><!-- #content end -->
+
+		<!-- Footer
+		============================================= -->
+		<footer id="footer" class="bg-transparent border-0">
+
+			<div class="container">
+
+				<!-- Footer Widgets
+				============================================= -->
+				<div class="footer-widgets-wrap pb-4">
+
+					<div class="row">
+
+						<div class="col-lg-2 col-md-2 col-6">
+							<div class="widget">
+
+								<h4 class="ls-0 mb-4 text-transform-none">Features</h4>
+
+								<ul class="list-unstyled iconlist ms-0">
+									<li class="mb-2"><a href="#">Help Center</a></li>
+									<li class="mb-2"><a href="#">Paid with Moblie</a></li>
+									<li class="mb-2"><a href="#">Status</a></li>
+									<li class="mb-2"><a href="#">Changelog</a></li>
+									<li class="mb-2"><a href="#">Contact Support</a></li>
+								</ul>
+
+							</div>
+						</div>
+						<div class="col-lg-2 col-md-2 col-6">
+							<div class="widget">
+
+								<h4 class="ls-0 mb-4 text-transform-none">Support</h4>
+
+								<ul class="list-unstyled iconlist ms-0">
+									<li class="mb-2"><a href="#">Home</a></li>
+									<li class="mb-2"><a href="demo-movers-company.html">About</a></li>
+									<li class="mb-2"><a href="demo-movers-faqs.html">FAQs</a></li>
+									<li class="mb-2"><a href="#">Support</a></li>
+									<li class="mb-2"><a href="demo-movers-contact.html">Contact</a></li>
+								</ul>
+
+							</div>
+						</div>
+						<div class="col-lg-2 col-md-2 col-6">
+							<div class="widget">
+
+								<h4 class="ls-0 mb-4 text-transform-none">Trending</h4>
+
+								<ul class="list-unstyled iconlist ms-0">
+									<li class="mb-2"><a href="#">Shop</a></li>
+									<li class="mb-2"><a href="#">Portfolio</a></li>
+									<li class="mb-2"><a href="#">Blog</a></li>
+									<li class="mb-2"><a href="#">Events</a></li>
+									<li class="mb-2"><a href="#">Forums</a></li>
+								</ul>
+
+							</div>
+						</div>
+						<div class="col-lg-2 col-md-2 col-6">
+							<div class="widget">
+
+								<h4 class="ls-0 mb-4 text-transform-none">Get to Know us</h4>
+
+								<ul class="list-unstyled iconlist ms-0">
+									<li class="mb-2"><a href="#">Corporate</a></li>
+									<li class="mb-2"><a href="#">Agency</a></li>
+									<li class="mb-2"><a href="#">eCommerce</a></li>
+									<li class="mb-2"><a href="#">Personal</a></li>
+									<li class="mb-2"><a href="#">OnePage</a></li>
+								</ul>
+
+							</div>
+						</div>
+						<div class="col-lg-4 col-md-4 text-md-end">
+							<div class="widget">
+
+								<h4 class="ls-0 mb-4 text-transform-none">Center for Climate Change and Research</h4>
+
+								<div>
+									<address>
+										Dr. Homi Bhabha Road, <br>
+										Pune, MH 411008<br>
+									</address>
+									<h3 class="mb-3"><a href="tel:+91(020) 25904200"><i class="fa-solid fa-phone me-1" style="font-size: 22px;"></i>+91(020) 25904200</a></h3>
+									<div class="d-flex justify-content-md-end">
+										<a href="#" class="social-icon si-small text-white bg-facebook" title="Facebook">
+											<i class="fa-brands fa-facebook-f"></i>
+											<i class="fa-brands fa-facebook-f"></i>
+										</a>
+
+										<a href="#" class="social-icon si-small text-white bg-instagram" title="instagram">
+											<i class="bi-instagram"></i>
+											<i class="bi-instagram"></i>
+										</a>
+
+										<a href="#" class="social-icon si-small text-white bg-paypal" title="Paypal">
+											<i class="fa-brands fa-paypal"></i>
+											<i class="fa-brands fa-paypal"></i>
+										</a>
+
+										<a href="#" class="social-icon si-small text-white bg-wikipedia me-0" title="Apple Pay">
+											<i class="fa-brands fa-apple-pay"></i>
+											<i class="fa-brands fa-apple-pay"></i>
+										</a>
+									</div>
+								</div>
+
+							</div>
+						</div>
+
+					</div>
+
+				</div><!-- .footer-widgets-wrap end -->
+
+			</div>
+
+			<!-- Copyrights
+			============================================= -->
+			<div id="copyrights" class="bg-transparent">
+
+				<div class="container">
+
+					<div class="row justify-content-between align-items-center">
+						<div class="col-md-6 text-black-50">
+							Copyrights &copy; 2025 All Rights Reserved by CCCR.
+						</div>
+
+						<div class="col-md-6 d-md-flex flex-md-column align-items-md-end mt-4 mt-md-0">
+							<div class="copyrights-menu copyright-links text-black-50">
+								<a href="demo-movers-company.html">About</a>/<a href="demo-movers-rates.html">Rates</a>/<a href="demo-movers-faqs.html">FAQs</a>/<a href="demo-movers-contact.html">Contact</a>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+			</div><!-- #copyrights end -->
+
+		</footer><!-- #footer end -->
+
+	</div><!-- #wrapper end -->
+
+	<!-- Go To Top
+	============================================= -->
+	<div id="gotoTop" class="uil uil-angle-up"></div>
+
+	<!-- JavaScripts
+	============================================= -->
+<script src="{% static 'js/plugins.min.js' %}"></script>
+<script src="{% static 'js/functions.bundle.js' %}"></script>
+<script src="{% static 'js/datepicker.js' %}"></script>
+
+	<script>
+		jQuery('.home-date').datepicker({
+			autoclose: true,
+			startDate: "today",
+		});
+	</script>
+
+</body>
+</html>
