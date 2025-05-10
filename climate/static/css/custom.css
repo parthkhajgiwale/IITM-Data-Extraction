@@ -1,0 +1,512 @@
+/* Image Container */
+        .image-container {
+            position: relative;
+            width: 100%;
+            height: 800px; /* Set the height of the image container */
+            overflow: hidden;
+        }
+
+        /* Actual Map */
+        #map {
+            position: absolute;
+            height:800px;
+            width: 95%;
+            z-index: 1;
+            margin: 50px;
+            margin-top: 0px;
+        }
+
+        /* Blinking Button on top of the map */
+        .image-container button {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            transform: translate(-50%, -50%);
+            padding: 10px 10px;
+            background-color: rgba(255, 215, 0, 0.9);
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            border-radius: 5px;
+            border-radius: 50%;
+            z-index: 5;
+        }
+
+        .image-container button:hover {
+            background-color: black;
+            color: rgba(255, 215, 0, 0.9);
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #2c2c2c;
+            padding: 50px;
+            padding-bottom: 10px;
+            border-radius: 10px;
+            width: 60%;
+            color: #ddd;
+            font-family: 'Segoe UI', sans-serif;
+            position: relative;
+        }
+
+        /* Blinking Button */
+        .blink-button {
+            background-color: #ffcc00;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            font-weight: bold;
+            cursor: pointer;
+            animation: blink 1s infinite;
+            border-radius: 5px;
+            z-index: 10;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+
+        /* Sidebar Button */
+        #toggleSidebarBtn {
+            position: fixed;
+            top: 400px;
+            left: 0px;
+            background-color: #ffcc00;
+            border: none;
+            border-radius: 0 5px 5px 0;
+            padding: 10px 15px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            z-index: 15;
+            animation: blink 1s infinite;
+        }
+
+        /* Sidebar Styling */
+        .sidebar {
+            position: absolute;
+            top: 0;
+            left: -350px;
+            width: 25%;
+            height: 800px;
+            background-color: #2c3e50;
+            color: #ecf0f1;
+            transition: 0.3s ease-in-out;
+            padding: 20px;
+            box-sizing: border-box;
+            z-index: 15;
+            overflow-y: auto;
+        }
+
+        /* When sidebar is open */
+        .sidebar.open {
+            left: 0;
+        }
+
+        /* Close Button */
+        .sidebar .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 30px;
+            color: #ecf0f1;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+
+        .sidebar .close-btn:hover {
+            color: #e74c3c;
+        }
+
+        /* Sidebar Header */
+        .sidebar-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .sidebar-header img {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-header h2 {
+            font-family: 'Arial', sans-serif;
+            font-size: 24px;
+            margin: 0;
+        }
+
+        /* Controls Styling */
+        .controls label {
+            font-size: 16px;
+            margin-top: 10px;
+            display: block;
+            font-weight: bold;
+            color: #ecf0f1;
+        }
+
+        .controls select, .controls input, .controls button {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #bdc3c7;
+            border-radius: 5px;
+            background-color: #ecf0f1;
+            font-size: 14px;
+            color: #34495e;
+        }
+
+        .controls select, .controls input {
+            box-sizing: border-box;
+        }
+
+        .controls button {
+            background-color: #3498db;
+            color: white;
+            cursor: pointer;
+            border: none;
+            transition: background-color 0.3s ease-in-out;
+        }
+
+        .controls button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Footer Styling */
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 14px;
+            padding-bottom: 0px;
+        }
+
+        .footer a {
+            color: #ecf0f1;
+        }
+
+        .footer a:hover {
+            color: blue;
+        }
+
+        /* For Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                left: -100%;
+            }
+
+            .sidebar.open {
+                left: 0;
+            }
+
+            .sidebar-header h2 {
+                font-size: 20px;
+            }
+        }
+
+       .plot-container {
+    display: grid;
+    margin-top: 20px;
+    flex-wrap: wrap;  
+    gap: 80px; 
+}
+
+.plot-section {
+    width: 60%;  
+    box-sizing: border-box; 
+    margin: 10px auto;  
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.plot-section h3 {
+    font-size: 20px;
+    color:black;
+    margin-bottom: 10px;
+}
+
+#timeSeriesPlot, #spatialPlot{
+    width:100% !important;
+    height: 400px !important;
+    background-color: #f7f7f7;
+}
+
+.popup {
+  display: none;
+  position: fixed;
+  z-index: 999;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.5);
+}
+
+.popup-content {
+  background-color: white;
+  margin: 15% auto;
+  padding: 20px;
+  padding-bottom: 5px;
+  border-radius: 8px;
+  width: 300px;
+  text-align: center;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.close-btn {
+  float: right;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.coordinates-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 20px;
+    background-color: #f9f9f9; /* subtle background */
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* soft shadow */
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.coordinates-container h3 {
+    text-align: center;
+    color: #333;
+    margin-bottom: 20px;
+}
+
+#coordinates-table {
+    width: 100%;
+    border-collapse: collapse;
+    background-color: #ffffff;
+}
+
+#coordinates-table th,
+#coordinates-table td {
+    padding: 12px 16px;
+    text-align: center;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+#coordinates-table thead {
+    background-color: #007BFF;
+    color: white;
+}
+
+#coordinates-table tbody tr:hover {
+    background-color: #f1f1f1; 
+    transition: background-color 0.3s ease;
+}
+
+
+@media (max-width: 600px) {
+    .coordinates-container {
+        padding: 15px;
+    }
+
+    #coordinates-table th,
+    #coordinates-table td {
+        padding: 10px;
+        font-size: 14px;
+    }
+
+    .coordinates-container h3 {
+        font-size: 18px;
+    }
+}
+
+
+#tables {
+    padding: 50px 0;
+}
+
+#tables .form-group {
+    margin-bottom: 20px;
+}
+
+#tables .btn-primary {
+    background-color: #007bff;
+    border-color: #007bff;
+}
+
+#tables .btn-primary:hover {
+    background-color: #0056b3;
+    border-color: #004085;
+}
+
+#data-table th {
+    background-color: #007bff;
+    color: white;
+}
+
+#data-table td {
+    vertical-align: middle;
+}
+
+@media (max-width: 767px) {
+    #tables .row {
+        display: block;
+    }
+
+    #tables .col-md-4, #tables .col-md-8 {
+        width: 100%;
+        padding: 0;
+        margin: 0;
+    }
+}
+
+/* Container to center the forgot password box */
+.forgot-password-box {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.forgot-password-box h2 {
+    font-size: 28px;
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 20px;
+}
+
+.forgot-password-box p {
+    font-size: 16px;
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.forgot-password-box .input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.forgot-password-box .input-group label {
+    font-size: 14px;
+    color: #444;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.forgot-password-box .input-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 6px;
+    font-size: 14px;
+    color: #333;
+    outline: none;
+    transition: border-color 0.3s ease;
+}
+
+.forgot-password-box .input-group input:focus {
+    border-color: #007bff;
+}
+
+.forgot-password-box .submit-btn {
+    width: 100%;
+    background-color: #007bff;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.forgot-password-box .submit-btn:hover {
+    background-color: #0056b3;
+}
+
+#success-popup, #error-popup {
+    background-color: white; 
+    color: black;
+    padding: 15px;
+    border-radius: 5px;
+    text-align: center;
+    font-size: 16px;
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    max-width: 300px;
+    width: 100%;
+    z-index: 9999;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+#success-popup.show, #error-popup.show { 
+    display: block;
+    opacity: 1;
+}
+
+ .reset-password-box {
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .reset-password-box h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .reset-password-box .input-group {
+            margin-bottom: 20px;
+        }
+
+        .reset-password-box .input-group label {
+            font-weight: bold;
+        }
+
+        .reset-password-box .input-group input {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .reset-password-box .submit-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .reset-password-box .submit-btn:hover {
+            background-color: #218838;
+        }
