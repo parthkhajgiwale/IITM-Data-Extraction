@@ -1,0 +1,672 @@
+{% load static %}
+<!DOCTYPE html>
+<html dir="ltr" lang="en-US">
+<head>
+
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="x-ua-compatible" content="IE=edge">
+	<meta name="author" content="APN">
+
+	<!-- Font Imports -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+	<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+	<link href="https://cdn.jsdelivr.net/npm/@iconscout/unicons/css/line.css" rel="stylesheet">
+
+
+	<!-- Core Style -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- Font Icons -->
+    <link rel="stylesheet" href="{% static 'css/font-icons.css' %}">
+
+    <!-- Plugins/Components CSS -->
+    <link rel="stylesheet" href="{% static 'css/datepicker.css' %}">
+
+    <!-- Niche Demos -->
+    <link rel="stylesheet" href="{% static 'css/niche.css' %}">
+
+    <!-- Custom Demos -->
+    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
+
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<!-- Document Title
+	============================================= -->
+	<title>Tool | Data Explorer</title>
+
+</head>
+
+<body class="stretched">
+
+	<!-- Document Wrapper
+	============================================= -->
+	<div id="wrapper">
+
+		<!-- Header
+		============================================= -->
+		<header id="header" class="dark header-size-sm" data-sticky-shrink="false">
+			<div class="container">
+				<div class="header-row">
+
+					<!-- Logo
+					============================================= -->
+					<div id="logo" class="ms-auto ms-md-0">
+						<a href="{% url 'home' %}">
+							<img class="logo-default" src="http://cccr.tropmet.res.in/home/images/CCCR_logo.png" alt="CCCR Logo" > </a>
+						</a>
+						<h5>Center for Climate Change and Research</h5>
+					</div><!-- #logo end -->
+
+					<ul class="header-extras d-none d-sm-flex mx-auto mx-md-0 mb-4 mb-md-0">
+						<li>
+							<i class="i-plain bi-telephone m-0"></i>
+							<div class="he-text fw-normal text-white-50">
+								Call Us:
+								<span><a href="tel:+91(020) 25904200" class="text-white fw-medium">+91(020) 25904200</a></span>
+							</div>
+						</li>
+						<li>
+							<i class="i-plain bi-envelope m-0"></i>
+							<div class="he-text fw-normal text-white-50">
+								Email Us:
+								<span><a href="mailto:info@tropmet.in" target="_top" class="text-white fw-medium">info@tropmet.in</a></span>
+							</div>
+						</li>
+					</ul>
+
+				</div>
+			</div>
+
+			<div id="header-wrap">
+				<div class="container">
+					<div class="header-row justify-content-between flex-row-reverse flex-lg-row">
+
+						<div class="header-misc">
+							<!-- Header Buttons
+							============================================= -->
+							<div class="header-buttons d-none d-sm-inline-block">
+								<a href="{% url 'home' %}" data-scrollto="#slider" data-offset="-80" class="button button-rounded button-white button-light button-small m-0">Logout</a>
+							</div>
+
+						</div>
+
+						<div class="primary-menu-trigger">
+							<button class="cnvs-hamburger" type="button" title="Open Mobile Menu">
+								<span class="cnvs-hamburger-box"><span class="cnvs-hamburger-inner"></span></span>
+							</button>
+						</div>
+
+						<!-- Primary Navigation
+						============================================= -->
+						<nav class="primary-menu with-arrows">
+
+							<ul class="menu-container">
+								<li class="menu-item"><a class="menu-link" href="{% url 'home' %}"><div>Home</div></a></li>
+								<li class="menu-item"><a class="menu-link"><div>Dataset</div></a>
+									<ul class="sub-menu-container" data-class="up-lg:not-dark">
+										<li class="menu-item"><a class="menu-link" href="{% url 'cmip6' %}"><div><i class="bi-database"></i>CMIP6</div></a></li>
+										<li class="menu-item"><a class="menu-link" href="{% url 'cordex' %}"><div><i class="bi-database"></i>CORDEX</div></a></li>
+										<li class="menu-item"><a class="menu-link" href="{% url 'cmip7' %}"><div><i class="bi-database"></i>CMIP7</div></a></li>
+									</ul>
+								</li>
+								<li class="menu-item"><a class="menu-link" href="{% url 'faq' %}"><div>FAQs</div></a></li>
+								<li class="menu-item"><a class="menu-link" href="{% url 'contact' %}"><div>Contact Us</div></a></li>
+							</ul>
+						</nav><!-- #primary-menu end -->
+
+
+					</div>
+				</div>
+			</div>
+			<div class="header-wrap-clone"></div>
+		</header><!-- #header end -->
+
+		<!-- Page Title
+		============================================= -->
+		<section class="page-title bg-color dark py-6">
+			<div class="container">
+				<div class="page-title-row">
+
+					<div class="page-title-content">
+						<h1>Climate Data Explorer </h1>
+						<span>Get Climate Data Insights</span>
+					</div>
+
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="#">Home</a></li>
+							<li class="breadcrumb-item active" aria-current="page">Explore</li>
+						</ol>
+					</nav>
+
+				</div>
+			</div>
+		</section><!-- .page-title end -->
+
+		<!-- Content
+		============================================= -->
+		<section id="content">
+				<div class="image-container">
+    				<div id="map"></div>
+    				<button  class="blink-button" onclick="toggleGuideModal()">ℹ️</button>
+  				</div>
+				<div class="coordinates-container">
+                <h3>Selected Coordinates:</h3>
+                <table id="coordinates-table">
+                    <thead>
+                        <tr>
+                            <th>Latitude</th>
+                            <th>Longitude</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Coordinates will be inserted here dynamically -->
+                    </tbody>
+                </table>
+    </div>
+				<div class="map-area" id="map"></div>
+				<div id="plotContainer" class="plot-container">
+    <!-- Time Series Plot Section (hidden by default) -->
+    <div id="timeSeriesPlotSection" class="plot-section" style="display: none;">
+        <h3>Time Series Plot</h3>
+        <canvas id="timeSeriesPlot" width="100%" height="400"></canvas>
+    </div>
+    
+    <!-- Spatial Plot Section (hidden by default) -->
+    <div id="spatialPlotSection" class="plot-section" style="display: none;">
+        <h3>Spatial Plot</h3>
+        <canvas id="spatialPlot" width="100%" height="400"></canvas>
+    </div>
+</div>
+				<div id="guideModal" class="modal">
+        			<div class="modal-content">
+            			<h2 style="color:white">How to Use the Climate Data Explorer</h2>
+            		<ul>
+                		<li><strong>Select Climate Variable:</strong> Choose the climate variable you want to explore (e.g., Temperature, Wind Speed, Precipitation).</li>
+                		<li><strong>Select Model:</strong> Choose the model for the climate data. Options include WAS-44i and CMIP6.</li>
+                		<li><strong>Set Date Range:</strong> Pick a start and end date using the date picker.</li>
+                		<li><strong>Select Coordinates:</strong> Click on the map to select the coordinates for your data exploration.</li>
+                		<li><strong>Plot Data:</strong> Once you've selected the data, click the "Plot Time Series" button to visualize the data over time.</li>
+                		<li><strong>Download Data:</strong> You can download the data in CSV format by clicking the "Download CSV" button.</li>
+                		<li><strong>Spatial Plot:</strong> If you selected the WAS-44i or CMIP6 model, you can generate a spatial plot of the data by clicking "Get Spatial Plot".</li>
+            		</ul>
+            		<p><strong style="color:red;">Note:<br> 
+						<ul><li style="color:red;">Please select the coordinates from the map for data exploration</li>
+						<li>You can navigate to the instructions in the ℹ️ button</li>
+					<li>You can access the tool by clicking on ☰ button </li></ul></strong></p>
+        			</div>
+    			</div>
+				<div class="sidebar">
+		<button id="toggleSidebarBtn" onclick="toggleSidebar()">☰</button>
+        <button class="close-btn" onclick="toggleSidebar()">×</button>
+        <div class="sidebar-header">
+            <img src="{% static 'images/step3.png' %}" alt="CCCR Logo" > <h2>EXPLORE</h2>
+        </div>
+
+        <div class="controls">
+            <label for="variable">SELECT CLIMATE VARIABLE</label>
+            <select id="variable">
+                <option value="tas">Temperature (tas)</option>
+                <option value="vas">Wind Speed (vas)</option>
+                <option value="pr">Precipitation (pr)</option>
+            </select>
+
+            <label for="model">SELECT THE MODEL</label>
+            <select id="model">
+                <option value="WAS-44i">WAS-44i</option>
+                <option value="CMIP6">CMIP6</option>
+            </select>
+			
+            <label for="start_date">START DATE</label>
+            <input type="month" id="start_date">
+			
+            <label for="end_date">END DATE</label>
+            <input type="month" id="end_date">
+			
+            <button id="func1" onclick="fetchData()">Plot Time Series</button>
+            <button id="func2" onclick="downloadCSV()">Download CSV</button>
+            <button id="spatial-plot-btn" onclick="getSpatialPlot()">Get Spatial Plot</button>
+        </div>
+
+        <div class="footer" id="Sidebar-footer">
+            <p>&copy; CCCR | <a href="#" >About</a> | <a href="#">Support</a> | <a href="#">License</a></p>
+        </div>
+    </div>
+	
+	<div id="customPopup" class="popup">
+  	<div class="popup-content">
+    <span class="close-btn" onclick="closePopup()">&times;</span>
+    <p>Please select the coordinates on the Map!</p>
+  </div>
+</div>
+
+				<div class="section dark pt-0 mb-0 bg-color" style="background: url('demos/movers/images/bg-2.png') no-repeat center bottom / 100%; overflow: visible">
+					<svg viewBox="0 0 1960 206.8" class="bg-white">
+						<path class="svg-themecolor" style="opacity:0.2;" d="M0,142.8A2337.49,2337.49,0,0,1,297.5,56.3C569.33-3.53,783.89.22,849.5,2.3c215.78,6.86,382.12,45.39,503.25,73.45,158.87,36.8,283.09,79.13,458.75,54.55A816.49,816.49,0,0,0,1983,86.8v110H0Z"></path>
+						<path class="svg-themecolor" d="M.5,152.8s498-177,849-150,1031,238,1134,94v110H.5Z"></path>
+					</svg>
+					
+					<div class="container">
+						<div class="row align-items-center justify-content-center text-center my-4">
+
+							<div class="col-sm-8">
+								<div class="heading-block border-bottom-0 mb-4">
+									<h2 class="fw-semibold ls-0 text-transform-none mb-3" style="font-size: 44px; line-height: 1.3">Contact Us</h2>
+									<p>Reach out to us for support, data inquiries, or collaborations — your insights drive better climate solutions.</p>
+								</div>
+								<a href="{% url 'contact' %}" class="button button-white button-light button-rounded fw-medium m-0">Get In Touch</a>
+							</div>
+
+						</div>
+					</div>
+				</div>
+		</section><!-- #content end -->
+		
+
+		<!-- Footer
+		============================================= -->
+		<footer id="footer" class="bg-transparent border-0">
+
+			<div class="container">
+
+				<!-- Footer Widgets
+				============================================= -->
+				<div class="footer-widgets-wrap pb-4">
+
+					<div class="row">
+
+						<div class="col-lg-2 col-md-2 col-6">
+							<div class="widget">
+
+								<h4 class="ls-0 mb-4 text-transform-none">Features</h4>
+
+								<ul class="list-unstyled iconlist ms-0">
+									<li class="mb-2"><a href="#">Help Center</a></li>
+									<li class="mb-2"><a href="#">Paid with Moblie</a></li>
+									<li class="mb-2"><a href="#">Status</a></li>
+									<li class="mb-2"><a href="#">Changelog</a></li>
+									<li class="mb-2"><a href="#">Contact Support</a></li>
+								</ul>
+
+							</div>
+						</div>
+						<div class="col-lg-2 col-md-2 col-6">
+							<div class="widget">
+
+								<h4 class="ls-0 mb-4 text-transform-none">Support</h4>
+
+								<ul class="list-unstyled iconlist ms-0">
+									<li class="mb-2"><a href="#">Home</a></li>
+									<li class="mb-2"><a href="demo-movers-company.html">About</a></li>
+									<li class="mb-2"><a href="demo-movers-faqs.html">FAQs</a></li>
+									<li class="mb-2"><a href="#">Support</a></li>
+									<li class="mb-2"><a href="demo-movers-contact.html">Contact</a></li>
+								</ul>
+
+							</div>
+						</div>
+						<div class="col-lg-2 col-md-2 col-6">
+							<div class="widget">
+
+								<h4 class="ls-0 mb-4 text-transform-none">Trending</h4>
+
+								<ul class="list-unstyled iconlist ms-0">
+									<li class="mb-2"><a href="#">Shop</a></li>
+									<li class="mb-2"><a href="#">Portfolio</a></li>
+									<li class="mb-2"><a href="#">Blog</a></li>
+									<li class="mb-2"><a href="#">Events</a></li>
+									<li class="mb-2"><a href="#">Forums</a></li>
+								</ul>
+
+							</div>
+						</div>
+						<div class="col-lg-2 col-md-2 col-6">
+							<div class="widget">
+
+								<h4 class="ls-0 mb-4 text-transform-none">Get to Know us</h4>
+
+								<ul class="list-unstyled iconlist ms-0">
+									<li class="mb-2"><a href="#">Corporate</a></li>
+									<li class="mb-2"><a href="#">Agency</a></li>
+									<li class="mb-2"><a href="#">eCommerce</a></li>
+									<li class="mb-2"><a href="#">Personal</a></li>
+									<li class="mb-2"><a href="#">OnePage</a></li>
+								</ul>
+
+							</div>
+						</div>
+						<div class="col-lg-4 col-md-4 text-md-end">
+							<div class="widget">
+
+								<h4 class="ls-0 mb-4 text-transform-none">Center for Climate Change and Research</h4>
+
+								<div>
+									<address>
+										Dr. Homi Bhabha Road, <br>
+										Pune, MH 411008<br>
+									</address>
+									<h3 class="mb-3"><a href="tel:+91(020) 25904200"><i class="fa-solid fa-phone me-1" style="font-size: 22px;"></i> +91(020) 25904200</a></h3>
+									<div class="d-flex justify-content-md-end">
+										<a href="#" class="social-icon si-small text-white bg-facebook" title="Facebook">
+											<i class="fa-brands fa-facebook-f"></i>
+											<i class="fa-brands fa-facebook-f"></i>
+										</a>
+
+										<a href="#" class="social-icon si-small text-white bg-instagram" title="instagram">
+											<i class="bi-instagram"></i>
+											<i class="bi-instagram"></i>
+										</a>
+
+										<a href="#" class="social-icon si-small text-white bg-paypal" title="Paypal">
+											<i class="fa-brands fa-paypal"></i>
+											<i class="fa-brands fa-paypal"></i>
+										</a>
+
+										<a href="#" class="social-icon si-small text-white bg-wikipedia me-0" title="Apple Pay">
+											<i class="fa-brands fa-apple-pay"></i>
+											<i class="fa-brands fa-apple-pay"></i>
+										</a>
+									</div>
+								</div>
+
+							</div>
+						</div>
+
+					</div>
+
+				</div><!-- .footer-widgets-wrap end -->
+
+			</div>
+
+			<!-- Copyrights
+			============================================= -->
+			<div id="copyrights" class="bg-transparent">
+
+				<div class="container">
+
+					<div class="row justify-content-between align-items-center">
+						<div class="col-md-6 text-black-50">
+							Copyrights &copy; 2025 All Rights Reserved by CCCR.
+						</div>
+
+						<div class="col-md-6 d-md-flex flex-md-column align-items-md-end mt-4 mt-md-0">
+							<div class="copyrights-menu copyright-links text-black-50">
+								<a href="demo-movers-company.html">About</a>/<a href="demo-movers-rates.html">Rates</a>/<a href="demo-movers-faqs.html">FAQs</a>/<a href="demo-movers-contact.html">Contact</a>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+			</div><!-- #copyrights end -->
+
+		</footer><!-- #footer end -->
+
+	</div><!-- #wrapper end -->
+
+	<!-- Go To Top
+	============================================= -->
+	<div id="gotoTop" class="uil uil-angle-up"></div>
+
+	<!-- JavaScripts
+	============================================= -->
+<script src="{% static 'js/plugins.min.js' %}"></script>
+<script src="{% static 'js/functions.bundle.js' %}"></script>
+<script src="{% static 'js/datepicker.js' %}"></script>
+	<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+	<!-- Include Chart.js -->
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        function toggleGuideModal() {
+    const modal = document.getElementById('guideModal');
+    if (modal.style.display === 'flex') {
+        modal.style.display = 'none';
+    } else {
+        modal.style.display = 'flex';
+    }
+}
+
+window.onclick = function(event) {
+    const modal = document.getElementById('guideModal');
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+};
+
+const sidebar = document.querySelector('.sidebar');
+const toggleBtn = document.getElementById('toggleSidebarBtn');
+const closeBtn = document.querySelector('.close-btn');  // Select the close button inside the sidebar
+
+// Toggle sidebar visibility when the toggle button is clicked
+toggleBtn.onclick = function () {
+    const isOpen = sidebar.classList.contains('open');
+    
+    if (isOpen) {
+        // Sidebar is open, hide the toggle button
+        sidebar.classList.remove('open');
+        toggleBtn.style.display = 'block';  // Ensure the button is visible again
+        toggleBtn.innerText = '☰';
+    } else {
+        // Sidebar is closed, show the toggle button
+        sidebar.classList.add('open');
+        toggleBtn.style.display = 'none';  // Hide the button when sidebar is open
+        toggleBtn.innerText = '✖';
+    }
+};
+
+// Close sidebar when the close button (×) inside the sidebar is clicked
+closeBtn.onclick = function () {
+    sidebar.classList.remove('open');  // Close the sidebar
+    toggleBtn.style.display = 'block';  // Show the toggle button again
+    toggleBtn.innerText = '☰';  // Set the button back to its original state
+};
+ // Initialize the map
+    var map = L.map('map',{zoomControl:false}).setView([25.0, 85.0], 5);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+    }).addTo(map);
+    L.control.zoom({
+    position: 'topright'  
+    }).addTo(map);
+
+	var polygonLayer = L.layerGroup().addTo(map);
+    var points = [];
+    var polygon;
+	const timeSeriesPlotSection = document.getElementById("timeSeriesPlotSection");
+	const spatialPlotSection = document.getElementById("spatialPlotSection");
+	const plotTimeSeriesButton = document.getElementById("func1");  
+	const spatialPlotButton = document.getElementById("spatial-plot-btn");  
+
+	timeSeriesPlotSection.style.display = "none";
+	spatialPlotSection.style.display = "none";
+
+    // Map click handler to collect coordinates
+    map.on('click', function(e) {
+        var lat = e.latlng.lat.toFixed(5);
+        var lon = e.latlng.lng.toFixed(5);
+
+        points.push({ lat: lat, lon: lon });
+        updateCoordinatesTable(); 
+
+        if (points.length >= 3) {
+            var latlngs = points.map(p => [parseFloat(p.lat), parseFloat(p.lon)]);
+            if (polygon) {
+                polygon.setLatLngs(latlngs);
+            } else {
+                polygon = L.polygon(latlngs, { color: 'blue' }).addTo(polygonLayer);
+            }
+        }
+    });
+	  // Function to update coordinates table
+    function updateCoordinatesTable() {
+        var tableBody = document.querySelector("#coordinates-table tbody");
+        tableBody.innerHTML = ""; 
+
+        points.forEach(function(point) {
+            var row = document.createElement('tr');
+            var latCell = document.createElement('td');
+            latCell.textContent = point.lat;
+            var lonCell = document.createElement('td');
+            lonCell.textContent = point.lon;
+            row.appendChild(latCell);
+            row.appendChild(lonCell);
+            tableBody.appendChild(row);
+        });
+    }
+
+	map.on('mousemove', function(e) {
+        var lat = e.latlng.lat.toFixed(5);
+        var lon = e.latlng.lng.toFixed(5);
+        document.getElementById('hover-coordinates').textContent = `Latitude: ${lat}, Longitude: ${lon}`;
+    });
+
+	// Fetch data for time series
+    function fetchData() {
+        var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
+        var variable = document.getElementById('variable').value;
+        var model = document.getElementById('model').value;
+        var startDate = document.getElementById('start_date').value;
+        var endDate = document.getElementById('end_date').value;
+
+        var url = `/get_timeseries?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}`;
+
+        fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data && data.length > 0) {
+                    var times = data.map(row => new Date(row.time));
+                    var values = data.map(row => row[variable]);
+
+                    var trace = {
+                        x: times,
+                        y: values,
+                        mode: 'lines',
+                        type: 'scatter',
+                        name: variable
+                    };
+
+                    var layout = {
+                        title: `${variable} Time Series (${model})`,
+                        xaxis: { title: 'Date' },
+                        yaxis: { title: variable }
+                    };
+
+                    document.getElementById('time-series-title').textContent = `${variable} Time Series (${model})`;
+
+                    Plotly.newPlot('plot', [trace], layout);
+
+                    document.getElementById('plot-container').style.visibility = 'visible';
+                } else {
+                    alert('No data available for the selected parameters.');
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching data:', error);
+                alert('There was an error fetching the data.');
+            });
+    }
+
+	//Spatial Plot
+	function getSpatialPlot() {
+    // Get the coordinates in the correct format
+    var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
+    var variable = document.getElementById('variable').value;
+    var model = document.getElementById('model').value;
+    var startDate = document.getElementById('start_date').value;
+    var endDate = document.getElementById('end_date').value;
+
+    // Construct the URL with a timestamp to avoid caching issues
+    var url = `/get_spatial_plot?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}&timestamp=${new Date().getTime()}`;
+
+    // Fetch the image from the server
+    fetch(url)
+        .then(response => {
+            // Check if the response is OK (status 200)
+            if (!response.ok) {
+                throw new Error('Failed to fetch the spatial plot: ' + response.statusText);
+            }
+            return response.blob();  // Convert the response to a blob (image data)
+        })
+        .then(blob => {
+            // Create an image element from the blob response
+            var img = document.createElement('img');
+            img.src = URL.createObjectURL(blob);  // Convert the blob to an object URL
+            img.alt = "Spatial Plot";
+            img.style.width = "75%";  // Make sure the image scales properly
+            img.style.height = "auto";
+
+            // Clear previous content and append the new image
+            var container = document.getElementById('plot-container');
+            container.innerHTML = '';  // Clear any existing content
+            container.appendChild(img);
+            container.style.visibility = 'visible';  // Make sure the plot container is visible
+        })
+        .catch(error => {
+            // Handle any errors in fetching or displaying the plot
+            console.error('Error fetching spatial plot:', error);
+            alert('Error fetching spatial plot. Please try again later.');
+        });
+}
+
+ // Download CSV of the time series data
+    function downloadCSV() {
+        var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
+        var variable = document.getElementById('variable').value;
+        var model = document.getElementById('model').value;
+        var startDate = document.getElementById('start_date').value;
+        var endDate = document.getElementById('end_date').value;
+
+        var url = `/download_csv?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}`;
+
+        window.location.href = url;
+    }
+
+
+function showPopup(message) {
+    const popup = document.getElementById('customPopup');
+    popup.querySelector('p').textContent = message;
+    popup.style.display = 'block';
+}
+
+function closePopup() {
+    document.getElementById('customPopup').style.display = 'none';
+}
+
+plotTimeSeriesButton.onclick = function() {
+    if (points.length < 3) {
+        showPopup("Please select at least 3 coordinates on the Map!");
+        return;
+    }
+    if (timeSeriesPlotSection.style.display === "none") {
+        timeSeriesPlotSection.style.display = "block";
+        renderTimeSeriesPlot();
+    }
+};
+
+spatialPlotButton.onclick = function() {
+    if (points.length < 3) {
+        showPopup("Please select at least 3 coordinates on the Map!");
+        return;
+    }
+    if (spatialPlotSection.style.display === "none") {
+        spatialPlotSection.style.display = "block";
+        renderSpatialPlot();
+    }
+};
+
+    </script>
+	<script>
+		jQuery('.home-date').datepicker({
+			autoclose: true,
+			startDate: "today",
+		});
+	</script>
+	<script>
+		setInterval(fetchProgress, 100000);
+	</script>
+</body>
+</html>
