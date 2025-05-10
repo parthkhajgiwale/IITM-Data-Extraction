@@ -1,0 +1,425 @@
+{% load static %}
+<!DOCTYPE html>
+<html dir="ltr" lang="en-US">
+<head>
+
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<meta http-equiv="x-ua-compatible" content="IE=edge">
+	<meta name="author" content="APN">
+
+	<!-- Font Imports -->
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+	<link href="https://cdn.jsdelivr.net/npm/@iconscout/unicons/css/line.css" rel="stylesheet">
+
+
+    <!-- Core Style -->
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    <!-- Font Icons -->
+    <link rel="stylesheet" href="{% static 'css/font-icons.css' %}">
+
+    <!-- Plugins/Components CSS -->
+    <link rel="stylesheet" href="{% static 'css/datepicker.css' %}">
+
+    <!-- Niche Demos -->
+    <link rel="stylesheet" href="{% static 'css/niche.css' %}">
+
+
+	<!-- Document Title
+	============================================= -->
+	<title>FAQs | Data Explorer </title>
+
+</head>
+
+<body class="stretched">
+
+	<!-- Document Wrapper
+	============================================= -->
+	<div id="wrapper">
+
+		<!-- Header
+		============================================= -->
+		<header id="header" class="dark header-size-sm" data-sticky-shrink="false">
+			<div class="container">
+				<div class="header-row">
+
+					<!-- Logo
+					============================================= -->
+					<div id="logo" class="ms-auto ms-md-0">
+						<a href="{% url 'home' %}">
+							<img class="logo-default" src="http://cccr.tropmet.res.in/home/images/CCCR_logo.png" alt="CCCR Logo" > </a>
+						</a>
+						<h5>Center for Climate Change and Research</h5>
+					</div><!-- #logo end -->
+
+					<ul class="header-extras d-none d-sm-flex mx-auto mx-md-0 mb-4 mb-md-0">
+						<li>
+							<i class="i-plain bi-telephone m-0"></i>
+							<div class="he-text fw-normal text-white-50">
+								Call Us:
+								<span><a href="tel:+91(020) 25904200" class="text-white fw-medium">+91(020) 25904200</a></span>
+							</div>
+						</li>
+						<li>
+							<i class="i-plain bi-envelope m-0"></i>
+							<div class="he-text fw-normal text-white-50">
+								Email Us:
+								<span><a href="mailto:info@tropmet.in" target="_top" class="text-white fw-medium">info@tropmet.in</a></span>
+							</div>
+						</li>
+					</ul>
+
+				</div>
+			</div>
+
+			<div id="header-wrap">
+				<div class="container">
+					<div class="header-row justify-content-between flex-row-reverse flex-lg-row">
+
+						<div class="header-misc">
+
+							<!-- Header Buttons
+							============================================= -->
+							<div class="header-buttons d-none d-sm-inline-block">
+								<a href="{% url 'login' %}" data-scrollto="#slider" data-offset="-80" class="button button-rounded button-white button-light button-small m-0">Login</a>
+							</div>
+
+						</div>
+
+						<div class="primary-menu-trigger">
+							<button class="cnvs-hamburger" type="button" title="Open Mobile Menu">
+								<span class="cnvs-hamburger-box"><span class="cnvs-hamburger-inner"></span></span>
+							</button>
+						</div>
+
+						<!-- Primary Navigation
+						============================================= -->
+						<nav class="primary-menu with-arrows">
+
+							<ul class="menu-container">
+								<li class="menu-item"><a class="menu-link" href="{% url 'home' %}"><div>Home</div></a></li>
+								<li class="menu-item"><a class="menu-link" ><div>Dataset</div></a>
+									<ul class="sub-menu-container" data-class="up-lg:not-dark">
+										<li class="menu-item"><a class="menu-link" href="{% url 'cmip6' %}"><div><i class="bi-database"></i>CMIP6</div></a></li>
+										<li class="menu-item"><a class="menu-link" href="{% url 'cordex' %}"><div><i class="bi-database"></i>CORDEX</div></a></li>
+										<li class="menu-item"><a class="menu-link" href="{% url 'cmip7' %}"><div><i class="bi-database"></i>CMIP7</div></a></li>
+									</ul>
+								</li>
+								<li class="menu-item"><a class="menu-link" href="{% url 'login' %}"><div>Explore</div></a></li>
+								<li class="menu-item"><a class="menu-link" href="{% url 'contact' %}"><div>Contact Us</div></a></li>
+							</ul>
+
+
+						</nav><!-- #primary-menu end -->
+
+					</div>
+				</div>
+			</div>
+			<div class="header-wrap-clone"></div>
+		</header><!-- #header end -->
+
+		<!-- Page Title
+		============================================= -->
+		<section class="page-title bg-color dark py-6">
+			<div class="container">
+				<div class="page-title-row">
+
+					<div class="page-title-content">
+						<h1>Frequently Asked Questions</h1>
+					</div>
+
+					<nav aria-label="breadcrumb">
+						<ol class="breadcrumb">
+							<li class="breadcrumb-item"><a href="#">Home</a></li>
+							<li class="breadcrumb-item active" aria-current="page">FAQs</li>
+						</ol>
+					</nav>
+
+				</div>
+			</div>
+		</section><!-- .page-title end -->
+
+		<!-- Content
+		============================================= -->
+		<section id="content">
+
+			<div class="content-wrap pb-0">
+
+				<div class="container mb-5">
+					<div class="section-clients mx-auto" style="max-width: 700px">
+						<div class="text-center mb-4">
+							<span class="badge rounded-pill lightthemecolor color text-uppercase ls-1 fw-medium py-2 px-3">Center for Climate Change and Research</span>
+						</div>
+						<div class="clear"></div>
+
+						<div class="toggle mt-5" data-state="open">
+							<div class="toggle-header flex-row-reverse">
+								<div class="toggle-icon">
+									<i class="toggle-closed bi-plus-circle"></i>
+									<i class="toggle-open bi-x-circle"></i>
+								</div>
+								<div class="toggle-title fw-medium">
+									Why Climate Data Extraction Tool?
+								</div>
+							</div>
+							<div class="toggle-content text-black-50">This tool allows researchers, policymakers, and developers to interactively select geographical coordinates and download or visualize climate variables (like temperature, precipitation, etc.) from major datasets such as CMIP6, CMIP7, and CORDEX for historical and future projections.</div>
+						</div>
+
+						<div class="toggle">
+							<div class="toggle-header flex-row-reverse">
+								<div class="toggle-icon">
+									<i class="toggle-closed bi-plus-circle"></i>
+									<i class="toggle-open bi-x-circle"></i>
+								</div>
+								<div class="toggle-title fw-medium">
+									What datasets are used in this Tool?
+								</div>
+							</div>
+							<div class="toggle-content text-black-50"><strong>CMIP6</strong>(Coupled Model Intercomparison Project Phase 6) provides global climate model outputs used in IPCC AR6.<br>
+
+							<strong>CMIP7</strong> is the upcoming phase with enhanced resolution and model realism, supporting AR7.<br>
+
+							<strong>CORDEX</strong> (Coordinated Regional Downscaling Experiment) offers regionally downscaled versions of CMIP data for higher spatial detail.</div>
+						</div>
+
+						<div class="toggle">
+							<div class="toggle-header flex-row-reverse">
+								<div class="toggle-icon">
+									<i class="toggle-closed bi-plus-circle"></i>
+									<i class="toggle-open bi-x-circle"></i>
+								</div>
+								<div class="toggle-title fw-medium">
+									What climate variables and timeframe are supported in the tool?
+								</div>
+							</div>
+							<div class="toggle-content text-black-50">Common climate variables include temperature, precipitation, humidity, wind speed, and others. Supported timeframes typically range from historical (1950s–2020s) to future projections (2021–2100) under different scenarios (SSPs or RCPs).</div>
+						</div>
+
+						<div class="toggle">
+							<div class="toggle-header flex-row-reverse">
+								<div class="toggle-icon">
+									<i class="toggle-closed bi-plus-circle"></i>
+									<i class="toggle-open bi-x-circle"></i>
+								</div>
+								<div class="toggle-title fw-medium">
+									Can I compare data across models or scenarios within the tool?
+								</div>
+							</div>
+							<div class="toggle-content text-black-50">Yes, the tool supports multi-model comparison and scenario overlay features. You can visualize how different models or scenarios respond to climate drivers over time or across spatial domains.</div>
+						</div>
+
+						<div class="toggle">
+							<div class="toggle-header flex-row-reverse">
+								<div class="toggle-icon">
+									<i class="toggle-closed bi-plus-circle"></i>
+									<i class="toggle-open bi-x-circle"></i>
+								</div>
+								<div class="toggle-title fw-medium">
+									Is the tool web based or do I need to install anything?
+								</div>
+							</div>
+							<div class="toggle-content text-black-50">Yes, it is entirely web-based. No installation is required—just access it via a modern browser. Data processing is handled on the backend using RESTful APIs. <b>User need to Login to get complete access of the tool.</b></div>
+						</div>
+
+						<div class="toggle border-0">
+							<div class="toggle-header flex-row-reverse">
+								<div class="toggle-icon">
+									<i class="toggle-closed bi-plus-circle"></i>
+									<i class="toggle-open bi-x-circle"></i>
+								</div>
+								<div class="toggle-title fw-medium">
+									I forgot my Password, how can I reset it?
+								</div>
+							</div>
+							<div class="toggle-content text-black-50">If you’ve forgotten your password, click on the <b>Forgot Password?</b> link on the login page. You’ll be prompted to enter your registered email address. A secure password reset link will be sent to your email.</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="clear"></div>
+
+				<div class="section dark pt-0 mb-0 bg-color" style="background: url('demos/movers/images/bg-2.png') no-repeat center bottom / 100%; overflow: visible">
+					<svg viewBox="0 0 1960 206.8" class="bg-white">
+						<path class="svg-themecolor" style="opacity:0.2;" d="M0,142.8A2337.49,2337.49,0,0,1,297.5,56.3C569.33-3.53,783.89.22,849.5,2.3c215.78,6.86,382.12,45.39,503.25,73.45,158.87,36.8,283.09,79.13,458.75,54.55A816.49,816.49,0,0,0,1983,86.8v110H0Z"></path>
+						<path class="svg-themecolor" d="M.5,152.8s498-177,849-150,1031,238,1134,94v110H.5Z"></path>
+					</svg>
+					<div class="container">
+						<div class="row align-items-center justify-content-center text-center my-4">
+
+							<div class="col-sm-8">
+								<div class="heading-block border-bottom-0 mb-4">
+									<h2 class="fw-semibold ls-0 text-transform-none mb-3" style="font-size: 44px; line-height: 1.3">Contact Us</h2>
+									<p>Reach out to us for support, data inquiries, or collaborations — your insights drive better climate solutions.</p>
+								</div>
+								<a href="{% url 'contact' %}" class="button button-white button-light button-rounded fw-medium m-0">Get In Touch</a>
+							</div>
+
+						</div>
+					</div>
+				</div>
+			</div>
+		</section><!-- #content end -->
+
+		<!-- Footer
+		============================================= -->
+		<footer id="footer" class="bg-transparent border-0">
+
+			<div class="container">
+
+				<!-- Footer Widgets
+				============================================= -->
+				<div class="footer-widgets-wrap pb-4">
+
+					<div class="row">
+
+						<div class="col-lg-2 col-md-2 col-6">
+							<div class="widget">
+
+								<h4 class="ls-0 mb-4 text-transform-none">Features</h4>
+
+								<ul class="list-unstyled iconlist ms-0">
+									<li class="mb-2"><a href="#">Help Center</a></li>
+									<li class="mb-2"><a href="#">Paid with Moblie</a></li>
+									<li class="mb-2"><a href="#">Status</a></li>
+									<li class="mb-2"><a href="#">Changelog</a></li>
+									<li class="mb-2"><a href="#">Contact Support</a></li>
+								</ul>
+
+							</div>
+						</div>
+						<div class="col-lg-2 col-md-2 col-6">
+							<div class="widget">
+
+								<h4 class="ls-0 mb-4 text-transform-none">Support</h4>
+
+								<ul class="list-unstyled iconlist ms-0">
+									<li class="mb-2"><a href="#">Home</a></li>
+									<li class="mb-2"><a href="demo-movers-company.html">About</a></li>
+									<li class="mb-2"><a href="demo-movers-faqs.html">FAQs</a></li>
+									<li class="mb-2"><a href="#">Support</a></li>
+									<li class="mb-2"><a href="demo-movers-contact.html">Contact</a></li>
+								</ul>
+
+							</div>
+						</div>
+						<div class="col-lg-2 col-md-2 col-6">
+							<div class="widget">
+
+								<h4 class="ls-0 mb-4 text-transform-none">Trending</h4>
+
+								<ul class="list-unstyled iconlist ms-0">
+									<li class="mb-2"><a href="#">Shop</a></li>
+									<li class="mb-2"><a href="#">Portfolio</a></li>
+									<li class="mb-2"><a href="#">Blog</a></li>
+									<li class="mb-2"><a href="#">Events</a></li>
+									<li class="mb-2"><a href="#">Forums</a></li>
+								</ul>
+
+							</div>
+						</div>
+						<div class="col-lg-2 col-md-2 col-6">
+							<div class="widget">
+
+								<h4 class="ls-0 mb-4 text-transform-none">Get to Know us</h4>
+
+								<ul class="list-unstyled iconlist ms-0">
+									<li class="mb-2"><a href="#">Corporate</a></li>
+									<li class="mb-2"><a href="#">Agency</a></li>
+									<li class="mb-2"><a href="#">eCommerce</a></li>
+									<li class="mb-2"><a href="#">Personal</a></li>
+									<li class="mb-2"><a href="#">OnePage</a></li>
+								</ul>
+
+							</div>
+						</div>
+						<div class="col-lg-4 col-md-4 text-md-end">
+							<div class="widget">
+
+								<h4 class="ls-0 mb-4 text-transform-none">Center for Climate Change and Research</h4>
+
+								<div>
+									<address>
+										Dr. Homi Bhabha Road, <br>
+										Pune, MH 411008<br>
+									</address>
+									<h3 class="mb-3"><a href="tel:+91(020) 25904200"><i class="fa-solid fa-phone me-1" style="font-size: 22px;"></i> +91(020) 25904200</a></h3>
+									<div class="d-flex justify-content-md-end">
+										<a href="#" class="social-icon si-small text-white bg-facebook" title="Facebook">
+											<i class="fa-brands fa-facebook-f"></i>
+											<i class="fa-brands fa-facebook-f"></i>
+										</a>
+
+										<a href="#" class="social-icon si-small text-white bg-instagram" title="instagram">
+											<i class="bi-instagram"></i>
+											<i class="bi-instagram"></i>
+										</a>
+
+										<a href="#" class="social-icon si-small text-white bg-paypal" title="Paypal">
+											<i class="fa-brands fa-paypal"></i>
+											<i class="fa-brands fa-paypal"></i>
+										</a>
+
+										<a href="#" class="social-icon si-small text-white bg-wikipedi me-0" title="Apple Pay">
+											<i class="fa-brands fa-apple-pay"></i>
+											<i class="fa-brands fa-apple-pay"></i>
+										</a>
+									</div>
+								</div>
+
+							</div>
+						</div>
+
+					</div>
+
+				</div><!-- .footer-widgets-wrap end -->
+
+			</div>
+
+			<!-- Copyrights
+			============================================= -->
+			<div id="copyrights" class="bg-transparent">
+
+				<div class="container">
+
+					<div class="row justify-content-between align-items-center">
+						<div class="col-md-6 text-black-50">
+							Copyrights &copy; 2025 All Rights Reserved by CCCR.
+						</div>
+
+						<div class="col-md-6 d-md-flex flex-md-column align-items-md-end mt-4 mt-md-0">
+							<div class="copyrights-menu copyright-links text-black-50">
+								<a href="demo-movers-company.html">About</a>/<a href="demo-movers-rates.html">Rates</a>/<a href="demo-movers-faqs.html">FAQs</a>/<a href="demo-movers-contact.html">Contact</a>
+							</div>
+						</div>
+					</div>
+
+				</div>
+
+			</div><!-- #copyrights end -->
+
+		</footer><!-- #footer end -->
+
+	</div><!-- #wrapper end -->
+
+	<!-- Go To Top
+	============================================= -->
+	<div id="gotoTop" class="uil uil-angle-up"></div>
+
+	<!-- JavaScripts
+	============================================= -->
+<script src="{% static 'js/plugins.min.js' %}"></script>
+<script src="{% static 'js/functions.bundle.js' %}"></script>
+<script src="{% static 'js/datepicker.js' %}"></script>
+
+	<script>
+		jQuery('.home-date').datepicker({
+			autoclose: true,
+			startDate: "today",
+		});
+	</script>
+
+</body>
+</html>
