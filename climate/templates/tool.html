@@ -168,7 +168,7 @@
                 </table>
     </div>
 				<div class="map-area" id="map"></div>
-				<div id="plotContainer" class="plot-container">
+				<div id="plot-container" class="plot-container">
     <!-- Time Series Plot Section (hidden by default) -->
     <div id="timeSeriesPlotSection" class="plot-section" style="display: none;">
         <h3>Time Series Plot</h3>
@@ -209,14 +209,19 @@
         <div class="controls">
             <label for="variable">SELECT CLIMATE VARIABLE</label>
             <select id="variable">
-                <option value="tas">Temperature (tas)</option>
-                <option value="vas">Wind Speed (vas)</option>
+                <option value="clt">Total Cloud Cover (clt)</option>
                 <option value="pr">Precipitation (pr)</option>
+                <option value="ta" id="ta-option" disabled>Air Temperature (ta)</option>
+                <option value="tas">Surface Air Temperature (tas)</option>
+                <option value="ua" id="ua-option" disabled>Zonal Wind (ua)</option>
+                <option value="uas">Surface Zonal Wind (uas)</option>
+                <option value="va" id="va-option" disabled>Meridional Wind (va)</option>
+                <option value="vas">Surface Meridional Wind (vas)</option>
             </select>
 
             <label for="model">SELECT THE MODEL</label>
             <select id="model">
-                <option value="WAS-44i">WAS-44i</option>
+                <option value="WAS-44I">WAS-44I</option>
                 <option value="CMIP6">CMIP6</option>
             </select>
 			
