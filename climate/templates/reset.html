@@ -108,9 +108,9 @@
 								<li class="menu-item"><a class="menu-link" href="{% url 'home' %}"><div>Home</div></a></li>
 								<li class="menu-item"><a class="menu-link" ><div>Dataset</div></a>
 									<ul class="sub-menu-container" data-class="up-lg:not-dark">
-										<li class="menu-item"><a class="menu-link" href="{% url 'cmip6' %}"><div><i class="bi-database"></i>CMIP6</div></a></li>
-										<li class="menu-item"><a class="menu-link" href="{% url 'cordex' %}"><div><i class="bi-database"></i>CORDEX</div></a></li>
-										<li class="menu-item"><a class="menu-link" href="{% url 'cmip7' %}"><div><i class="bi-database"></i>CMIP7</div></a></li>
+										<li class="menu-item"><a class="menu-link" href="{% url 'climate_files' 'cmip6' %}"><div><i class="bi-database"></i>CMIP6</div></a></li>
+                                		<li class="menu-item"><a class="menu-link" href="{% url 'climate_files' 'cordex' %}"><div><i class="bi-database"></i>CORDEX</div></a></li>
+                                		<li class="menu-item"><a class="menu-link" href="{% url 'climate_files' 'cmip7' %}"><div><i class="bi-database"></i>CMIP7</div></a></li>
 									</ul>
 								</li>
 								<li class="menu-item"><a class="menu-link" href="{% url 'faq' %}"><div>FAQs</div></a></li>
