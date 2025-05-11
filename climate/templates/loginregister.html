@@ -189,19 +189,22 @@
                                 <h3 class="mb-4" style="color:#094183">Register for an Account</h3>
                                 <form id="register-form" method="post">
 									{% csrf_token %}
-                                    <label for="register-name">Name:</label>
-                                    <input type="text" id="register-name" name="register-name" class="form-control">
-
-                                    <label for="register-email">Email Address:</label>
-                                    <input type="email" id="register-email" name="register-email" class="form-control">
-
-                                    <label for="register-username">Enter a Username:</label>
+									<label for="id_username">Username:</label>
                                     <input type="text" id="register-username" name="register-username" class="form-control">
 
-                                    <label for="register-password">Enter Password:</label>
+                                    <label for="id_first_name">First Name:</label>
+                                    <input type="text" id="register-name" name="register-name" class="form-control">
+
+									<label for="id_last_name">Last Name:</label>
+                                    <input type="text" id="register-name" name="register-name" class="form-control">
+
+                                    <label for="id_email">Email Address:</label>
+                                    <input type="email" id="register-email" name="register-email" class="form-control">
+
+                                    <label for="id_password1">Enter Password:</label>
                                     <input type="password" id="register-password" name="register-password" class="form-control">
 
-                                    <label for="register-repassword">Re-enter Password:</label>
+                                    <label for="id_password2">Re-enter Password:</label>
                                     <input type="password" id="register-repassword" name="register-repassword" class="form-control">
 
                                     <div class="mt-3">
