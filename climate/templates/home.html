@@ -103,9 +103,9 @@
 								<li class="menu-item current"><a class="menu-link" href="{% url 'home' %}"><div>Home</div></a></li>
 								<li class="menu-item"><a class="menu-link" href="#datasets"><div>Dataset</div></a>
 									<ul class="sub-menu-container" data-class="up-lg:not-dark">
-										<li class="menu-item"><a class="menu-link" href="{% url 'cmip6' %}"><div><i class="bi-database"></i>CMIP6</div></a></li>
-										<li class="menu-item"><a class="menu-link" href="{% url 'cordex' %}"><div><i class="bi-database"></i>CORDEX</div></a></li>
-										<li class="menu-item"><a class="menu-link" href="{% url 'cmip7' %}"><div><i class="bi-database"></i>CMIP7</div></a></li>
+										<li class="menu-item"><a class="menu-link" href="{% url 'climate_files' 'CMIP6' %}"><div><i class="bi-database"></i>CMIP6</div></a></li>
+										<li class="menu-item"><a class="menu-link" href="{% url 'climate_files' 'WAS-44I' %}"><div><i class="bi-database"></i>CORDEX</div></a></li>
+										<li class="menu-item"><a class="menu-link" href="{% url 'climate_files' 'CMIP6' %}"><div><i class="bi-database"></i>CMIP7</div></a></li>
 									</ul>
 								</li>
 								<li class="menu-item"><a class="menu-link" href="{% url 'faq' %}"><div>FAQs</div></a></li>
@@ -216,7 +216,7 @@
 										<i class="bi-database"></i>
 									</div>
 									<div class="fbox-content">
-										<h3 class="fw-semibold"><a href="{% url 'cmip6' %}">CMIP6</a></h3>
+										<h3 class="fw-semibold"><a href="{% url 'climate_files' 'CMIP6' %}">CMIP6</a></h3>
 										<p class="text-muted">CMIP6 provides crucial global climate projections from multiple models, supporting climate research and policy by offering data on temperature, precipitation, and more under various emission scenarios.</p>
 									</div>
 								</div>
@@ -227,7 +227,7 @@
 										<i class="bi-database"></i>
 									</div>
 									<div class="fbox-content">
-										<h3 class="fw-semibold"><a href="{% url 'cordex' %}">CORDEX</a></h3>
+										<h3 class="fw-semibold"><a href="{% url 'climate_files' 'WAS-44I' %}">CORDEX</a></h3>
 										<p class="text-muted">CORDEX focuses on regional climate downscaling, providing high-resolution climate projections tailored to specific regions, helping to assess local climate impacts and inform adaptation strategies.</p>
 									</div>
 								</div>
@@ -238,7 +238,7 @@
 										<i class="bi-database"></i>
 									</div>
 									<div class="fbox-content">
-										<h3 class="fw-semibold"><a href="{% url 'cmip7' %}">CMIP7</a></h3>
+										<h3 class="fw-semibold"><a href="{% url 'climate_files' 'CMIP6' %}">CMIP7</a></h3>
 										<p class="text-muted">CMIP7, the next phase of the project, will enhance climate modeling capabilities, providing more accurate and detailed future climate scenarios to support global climate assessments and informed policy decisions.</p>
 									</div>
 								</div>

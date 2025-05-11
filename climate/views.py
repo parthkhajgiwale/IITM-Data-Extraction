@@ -27,17 +27,6 @@ from .forms import RegisterForm
 import tempfile
 import requests
 import os
-
-logger = logging.getLogger(__name__)
-plt.clf()
-# Database configuration
-DB_CONFIG = settings.DB_CONFIG
-
-
-def base(request):
-    return render(request, 'base.html')
-
-
 from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib.auth.forms import AuthenticationForm
@@ -46,6 +35,14 @@ from django.contrib import messages
 from .forms import RegisterForm
 from django.core.mail import send_mail
 
+logger = logging.getLogger(__name__)
+plt.clf()
+# Database configuration
+DB_CONFIG = settings.DB_CONFIG
+
+
+def base(request):
+    return render(request, 'home.html')
 
 def register_view(request):
     if request.method == 'POST':
@@ -70,7 +67,15 @@ def register_view(request):
             return redirect('home')
     else:
         form = RegisterForm()
-    return render(request, 'register.html', {'form': form})
+    return render(request, 'loginregister.html', {'form': form})
+
+def faq_view(request):
+    return render(request, 'faq.html')  # or whatever template you use
+def contact_view(request):
+    return render(request, 'contact.html')  # or whatever template you use
+def forgot_view(request):
+    return render(request, 'forgot.html')  # or whatever template you use
+
 
 
 @login_required
@@ -113,7 +118,7 @@ def home(request):
     """Render the homepage with variable and model options."""
     climate_variables = ['vas', 'tas', 'pr']
     models = ['CMIP6', 'WAS-44I']
-    return render(request, 'index.html', {'climate_variables': climate_variables, 'models': models})
+    return render(request, 'tool.html', {'climate_variables': climate_variables, 'models': models})
 
 
 def get_spatial_plot(request):

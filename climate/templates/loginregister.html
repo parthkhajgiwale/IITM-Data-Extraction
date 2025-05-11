@@ -28,14 +28,10 @@
     <!-- Niche Demos -->
     <link rel="stylesheet" href="{% static 'css/niche.css' %}">
 
-    <!-- Custom Demos -->
-    <link rel="stylesheet" href="{% static 'css/custom.css' %}">
-
-	<meta name="viewport" content="width=device-width, initial-scale=1">
 
 	<!-- Document Title
 	============================================= -->
-	<title>CMIP7 | Data Explorer</title>
+	<title>Login-Register | Data Explorer</title>
 
 </head>
 
@@ -87,9 +83,6 @@
 						<div class="header-misc">
 							<!-- Header Buttons
 							============================================= -->
-                            <div class="header-buttons d-none d-sm-inline-block">
-								<a href="{% url 'login' %}" data-scrollto="#slider" data-offset="-80" class="button button-rounded button-white button-light button-small m-0">Login</a>
-							</div>
 							
 
 						</div>
@@ -106,16 +99,18 @@
 
 							<ul class="menu-container">
 								<li class="menu-item"><a class="menu-link" href="{% url 'home' %}"><div>Home</div></a></li>
-								<li class="menu-item"><a class="menu-link"><div>Dataset</div></a>
+								<li class="menu-item"><a class="menu-link" ><div>Dataset</div></a>
 									<ul class="sub-menu-container" data-class="up-lg:not-dark">
-										<li class="menu-item"><a class="menu-link" href="{% url 'cmip6' %}"><div><i class="bi-database"></i>CMIP6</div></a></li>
-										<li class="menu-item"><a class="menu-link" href="{% url 'cordex' %}"><div><i class="bi-database"></i>CORDEX</div></a></li>
+										<li class="menu-item"><a class="menu-link" href="{% url 'climate_files' 'CMIP6' %}"><div><i class="bi-database"></i>CMIP6</div></a></li>
+										<li class="menu-item"><a class="menu-link" href="{% url 'climate_files' 'WAS-44I' %}"><div><i class="bi-database"></i>CORDEX</div></a></li>
+										<li class="menu-item"><a class="menu-link" href="{% url 'climate_files' 'CMIP6' %}"><div><i class="bi-database"></i>CMIP7</div></a></li>
 									</ul>
 								</li>
 								<li class="menu-item"><a class="menu-link" href="{% url 'faq' %}"><div>FAQs</div></a></li>
 								<li class="menu-item"><a class="menu-link" href="{% url 'contact' %}"><div>Contact Us</div></a></li>
 							</ul>
 						</nav><!-- #primary-menu end -->
+
 
 					</div>
 				</div>
@@ -130,16 +125,14 @@
 				<div class="page-title-row">
 
 					<div class="page-title-content">
-						<h1>CMIP7</h1>
-						<span>"The Future of Climate Research Starts Here: CMIP7"</span>
+						<h1>Start your Journey Today </h1>
+						<span>Register or Login to your Account</span>
 					</div>
 
 					<nav aria-label="breadcrumb">
 						<ol class="breadcrumb">
 							<li class="breadcrumb-item"><a href="#">Home</a></li>
-							<li class="breadcrumb-item active" aria-current="page">Dataset</li>
-                            <li class="breadcrumb-item active" aria-current="page">CMIP7</li>
-
+							<li class="breadcrumb-item active" aria-current="page">Login-Register</li>
 						</ol>
 					</nav>
 
@@ -150,73 +143,81 @@
 		<!-- Content
 		============================================= -->
 		<section id="content">
-            <section id="tables">
-    <div class="container">
-        <div class="row">
-            <!-- Filter Section -->
-            <div class="col-md-4 col-sm-12 mb-4">
-                <h3>Filter Options</h3>
-                <form id="filter-form">
-                    <div class="form-group">
-                        <label for="variable-select">Select Variable</label>
-                        <select id="variable-select" class="form-control">
-                            <option value="">Select a Variable</option>
-                            <option value="Variable1">vas</option>
-                            <option value="Variable2">pr</option>
-                            <option value="Variable3">tas</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <button type="button" class="btn btn-primary" onclick="filterData()">Filter</button>
-                    </div>
-                </form>
-            </div>
+				 <section id="content" style="padding-top: 160px;">
+        <div class="container">
+            <div class="mx-auto" style="max-width: 500px;">
+                <!-- Tabs -->
+                <ul class="nav nav-pills justify-content-center mb-4" id="tab-nav" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="login-tab" data-bs-toggle="pill" data-bs-target="#login"
+                                type="button" role="tab" aria-controls="login" aria-selected="true">Login</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="register-tab" data-bs-toggle="pill" data-bs-target="#register"
+                                type="button" role="tab" aria-controls="register" aria-selected="false">Register</button>
+                    </li>
+                </ul>
 
-            <!-- Table Section -->
-            <div class="col-md-8 col-sm-12">
-                <h3>Data Table</h3>
-                <table id="data-table" class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Variable Name</th>
-                            <th>File Name</th>
-                            <th>Frequency</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="variable1">
-                            <td>vas</td>
-                            <td>File1.txt</td>
-                            <td>Daily</td>
-                        </tr>
-                        <tr class="variable2">
-                            <td>pr</td>
-                            <td>File2.csv</td>
-                            <td>Monthly</td>
-                        </tr>
-                        <tr class="variable3">
-                            <td>tas</td>
-                            <td>File3.json</td>
-                            <td>Yearly</td>
-                        </tr>
-                        <tr class="variable1">
-                            <td>vas</td>
-                            <td>File4.txt</td>
-                            <td>Weekly</td>
-                        </tr>
-                        <tr class="variable2">
-                            <td>pr</td>
-                            <td>File5.csv</td>
-                            <td>Monthly</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <!-- Tab Content -->
+                <div class="tab-content">
+                    <!-- Login Form -->
+                    <div class="tab-pane fade show active" id="login" role="tabpanel" aria-labelledby="login-tab">
+                        <div class="card">
+                            <div class="card-body p-4">
+                                <h3 class="mb-4">Login to your Account</h3>
+                                <form id="login-form" method="post">
+									{% csrf_token %}
+                                    <label for="login-username">Username/Email id:</label>
+                                    <input type="text" id="login-username" name="login-username" class="form-control">
+
+                                    <label for="login-password">Password:</label>
+                                    <input type="password" id="login-password" name="login-password" class="form-control">
+
+                                    <div class="d-flex justify-content-between align-items-center mt-3">
+                                        <button type="submit" class="button">Login</button>
+                                        <a href="{% url 'forgot' %}">Forgot Password?</a>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Register Form -->
+                    <div class="tab-pane fade" id="register" role="tabpanel" aria-labelledby="register-tab">
+                        <div class="card">
+                            <div class="card-body p-4">
+                                <h3 class="mb-4" style="color:#094183">Register for an Account</h3>
+                                <form id="register-form" method="post">
+									{% csrf_token %}
+                                    <label for="register-name">Name:</label>
+                                    <input type="text" id="register-name" name="register-name" class="form-control">
+
+                                    <label for="register-email">Email Address:</label>
+                                    <input type="email" id="register-email" name="register-email" class="form-control">
+
+                                    <label for="register-username">Enter a Username:</label>
+                                    <input type="text" id="register-username" name="register-username" class="form-control">
+
+                                    <label for="register-password">Enter Password:</label>
+                                    <input type="password" id="register-password" name="register-password" class="form-control">
+
+                                    <label for="register-repassword">Re-enter Password:</label>
+                                    <input type="password" id="register-repassword" name="register-repassword" class="form-control">
+
+                                    <div class="mt-3">
+                                        <button type="submit" class="button">Register Now</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
-    </div>
-</section>
+    </section>
 				
-				<div class="section dark pt-0 mb-0 bg-color" style="background: url('demos/movers/images/bg-2.png') no-repeat center bottom / 100%; overflow: visible">
+				<div class="section dark pt-0 mb-0 bg-color" style="background: url('') no-repeat center bottom / 100%; overflow: visible">
 					<svg viewBox="0 0 1960 206.8" class="bg-white">
 						<path class="svg-themecolor" style="opacity:0.2;" d="M0,142.8A2337.49,2337.49,0,0,1,297.5,56.3C569.33-3.53,783.89.22,849.5,2.3c215.78,6.86,382.12,45.39,503.25,73.45,158.87,36.8,283.09,79.13,458.75,54.55A816.49,816.49,0,0,0,1983,86.8v110H0Z"></path>
 						<path class="svg-themecolor" d="M.5,152.8s498-177,849-150,1031,238,1134,94v110H.5Z"></path>
@@ -389,22 +390,5 @@
 <script src="{% static 'js/plugins.min.js' %}"></script>
 <script src="{% static 'js/functions.bundle.js' %}"></script>
 <script src="{% static 'js/datepicker.js' %}"></script>
-<script>
-    function filterData() {
-        const selectedVariable = document.getElementById('variable-select').value;
-        const rows = document.querySelectorAll('#data-table tbody tr');
-        
-        rows.forEach(row => {
-            if (selectedVariable === "" || row.classList.contains(selectedVariable.toLowerCase())) {
-                row.style.display = ""; // Show row
-            } else {
-                row.style.display = "none"; // Hide row
-            }
-        });
-    }
-</script>
-   
-
-	
 </body>
 </html>
