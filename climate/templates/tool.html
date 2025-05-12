@@ -88,7 +88,10 @@
 							<!-- Header Buttons
 							============================================= -->
 							<div class="header-buttons d-none d-sm-inline-block">
-								<a href="{% url 'home' %}" data-scrollto="#slider" data-offset="-80" class="button button-rounded button-white button-light button-small m-0">Logout</a>
+								<form method="post" action="{% url 'logout' %}" style="display: inline;">
+									{% csrf_token %}
+									<button type="submit" class="button button-rounded button-white button-light button-small m-0">Logout</button>
+								</form>
 							</div>
 
 						</div>
