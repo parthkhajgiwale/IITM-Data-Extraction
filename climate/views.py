@@ -173,70 +173,66 @@ def get_spatial_plot(request):
                     return JsonResponse({'error': f'Failed to download {url}'}, status=400)
 
             # Open dataset while preserving spatial structure
-            datasets = xr.open_mfdataset(temp_files, combine='by_coords', decode_cf=True, engine="netcdf4")
+            with xr.open_mfdataset(temp_files, combine='by_coords', decode_cf=True, engine="netcdf4") as datasets:
+                # Normalize time format
+                datasets['time'] = normalize_cftime_to_gregorian(datasets['time'].values)
 
-            # Normalize time format
-            datasets['time'] = normalize_cftime_to_gregorian(datasets['time'].values)
+                # Select time range
+                time_filtered_data = datasets[variable].sel(time=slice(start_date, end_date))
 
-            # Select time range
-            time_filtered_data = datasets[variable].sel(time=slice(start_date, end_date))
+                # Extract spatial region
+                lons = np.array([coord[1] for coord in coordinates])
+                lats = np.array([coord[0] for coord in coordinates])
+                min_lat, max_lat = min(lats), max(lats)
+                min_lon, max_lon = min(lons), max(lons)
 
-            # Extract spatial region
-            lons = np.array([coord[1] for coord in coordinates])
-            lats = np.array([coord[0] for coord in coordinates])
-            min_lat, max_lat = min(lats), max(lats)
-            min_lon, max_lon = min(lons), max(lons)
+                regional_data = time_filtered_data.sel(lat=slice(min_lat, max_lat), lon=slice(min_lon, max_lon))
 
-            regional_data = time_filtered_data.sel(lat=slice(min_lat, max_lat), lon=slice(min_lon, max_lon))
+                # Get lat and lon grid
+                lon_values, lat_values = np.meshgrid(regional_data.lon.values, regional_data.lat.values)
 
-            # Get lat and lon grid
-            lon_values, lat_values = np.meshgrid(regional_data.lon.values, regional_data.lat.values)
+                # Select a single time step (first time step for now)
+                data_values = regional_data.values[0, :, :]
 
-            # Select a single time step (first time step for now)
-            data_values = regional_data.values[0, :, :]
+                # Ensure shape consistency
+                if lon_values.shape != lat_values.shape or lon_values.shape != data_values.shape:
+                    raise ValueError(f"Shape mismatch: lon_values, lat_values, and data_values must have the same shape.")
 
-            # Ensure shape consistency
-            if lon_values.shape != lat_values.shape or lon_values.shape != data_values.shape:
-                raise ValueError(f"Shape mismatch: lon_values, lat_values, and data_values must have the same shape.")
+                # Perform interpolation at requested coordinates
+                interpolated_values = griddata(
+                    (lon_values.flatten(), lat_values.flatten()),
+                    data_values.flatten(),
+                    (lons, lats),
+                    method='linear'
+                )
 
-            # Perform interpolation at requested coordinates
-            interpolated_values = griddata(
-                (lon_values.flatten(), lat_values.flatten()),
-                data_values.flatten(),
-                (lons, lats),
-                method='linear'
-            )
+                # Handle NaN values in interpolation
+                interpolated_values = np.nan_to_num(interpolated_values, nan=0)
 
-            # Handle NaN values in interpolation
-            interpolated_values = np.nan_to_num(interpolated_values, nan=0)
+                # Create spatial plot
+                fig, ax = plt.subplots(figsize=(8, 6), dpi=200, subplot_kw={'projection': ccrs.PlateCarree()})
+                ax.set_extent([min_lon, max_lon, min_lat, max_lat], crs=ccrs.PlateCarree())
 
-            # Create spatial plot
-            fig, ax = plt.subplots(figsize=(8, 6), dpi=200, subplot_kw={'projection': ccrs.PlateCarree()})
-            ax.set_extent([min_lon, max_lon, min_lat, max_lat], crs=ccrs.PlateCarree())
+                # Add map features
+                ax.add_feature(cfeature.LAND, edgecolor='black')
+                ax.add_feature(cfeature.COASTLINE, edgecolor='black')
+                ax.add_feature(cfeature.BORDERS, edgecolor='gray', linestyle=':', linewidth=1)
+                ax.gridlines(draw_labels=True, linewidth=1, color='gray', linestyle='--')
 
-            # Add map features
-            ax.add_feature(cfeature.LAND, edgecolor='black')
-            ax.add_feature(cfeature.COASTLINE, edgecolor='black')
-            ax.add_feature(cfeature.BORDERS, edgecolor='gray', linestyle=':', linewidth=1)
-            ax.gridlines(draw_labels=True, linewidth=1, color='gray', linestyle='--')
+                # Contour plot
+                contour = ax.contourf(lon_values, lat_values, data_values, 20, cmap='viridis', transform=ccrs.PlateCarree())
 
-            # Contour plot
-            contour = ax.contourf(lon_values, lat_values, data_values, 20, cmap='viridis', transform=ccrs.PlateCarree())
+                # Add color bar
+                cbar = plt.colorbar(contour, ax=ax, orientation='vertical', pad=0.05)
+                cbar.set_label(f'Concentration of {variable}', fontsize=12)
 
-            # Add color bar
-            cbar = plt.colorbar(contour, ax=ax, orientation='vertical', pad=0.05)
-            cbar.set_label(f'Concentration of {variable}', fontsize=12)
+                # Title
+                plt.title(f'Spatial Distribution of {variable} ({model})', fontsize=16)
 
-            # Title
-            plt.title(f'Spatial Distribution of {variable} ({model})', fontsize=16)
-
-            # Save plot to buffer
-            buffer = io.BytesIO()
-            plt.savefig(buffer, format='png', bbox_inches='tight')
-            buffer.seek(0)
-
-            # Close dataset
-            datasets.close()
+                # Save plot to buffer
+                buffer = io.BytesIO()
+                plt.savefig(buffer, format='png', bbox_inches='tight')
+                buffer.seek(0)
 
             return HttpResponse(buffer, content_type='image/png')
 
@@ -251,19 +247,30 @@ def get_spatial_plot(request):
 def get_timeseries(request):
     """Fetch and return time-series data as JSON."""
     try:
+        logger.info("get_timeseries called")
+        logger.info(f"Request method: {request.method}")
+        logger.info(f"Request GET params: {request.GET}")
+
         # Extract data using common function
         time_series_df, error = extract_time_series_data(request)
+        logger.info(f"extract_time_series_data returned error: {error}")
+        logger.info(f"extract_time_series_data returned df: {time_series_df.head() if time_series_df is not None else 'None'}")
+
         if error:
+            logger.error(f"Returning error response: {error}")
             return JsonResponse(error, status=400 if 'error' in error else 500)
 
         # Convert DataFrame time column to formatted string
         time_series_df['time'] = pd.to_datetime(time_series_df['time']).dt.strftime('%Y-%m-%dT%H:%M:%S')
+        logger.info(f"Formatted time column: {time_series_df['time'].head()}")
 
         # Return the time series data as JSON
-        return JsonResponse(time_series_df.to_dict(orient='records'), safe=False)
+        result = time_series_df.to_dict(orient='records')
+        logger.info(f"Returning JSON response with {len(result)} records")
+        return JsonResponse(result, safe=False)
 
     except Exception as e:
-        print(f"Error occurred: {e}")
+        logger.exception(f"Error occurred in get_timeseries: {e}")
         return JsonResponse({'error': str(e)}, status=500)
 
 
@@ -336,32 +343,31 @@ def extract_time_series_data(request):
                 else:
                     send_progress(f"Failed to download {url}")
                     return None, {'error': f'Failed to download {url}'}
-            # Open dataset with `decode_cf=True` to properly interpret time
-            datasets = xr.open_mfdataset(temp_files, combine='by_coords', decode_cf=True, engine="netcdf4")
+            try:
+                with xr.open_mfdataset(temp_files, combine='by_coords', decode_cf=True, engine="netcdf4") as datasets:
+                    # Normalize time format
+                    datasets['time'] = normalize_cftime_to_gregorian(datasets['time'].values)
+                    time_filtered_data = datasets[variable].sel(time=slice(start_date, end_date))
 
-            # Normalize time format
-            datasets['time'] = normalize_cftime_to_gregorian(datasets['time'].values)
-            time_filtered_data = datasets[variable].sel(time=slice(start_date, end_date))
+                    # Handle data selection (point or region)
+                    if lat and lon:
+                        lat, lon = float(lat), float(lon)
+                        data = time_filtered_data.sel(lat=lat, lon=lon, method="nearest")
+                    elif coordinates:
+                        coords = [tuple(map(float, coord.split(','))) for coord in coordinates.split(';') if coord]
+                        if not coords:
+                            return None, {'error': 'No valid coordinates provided.'}
+                        min_lat, max_lat = min(c[0] for c in coords), max(c[0] for c in coords)
+                        min_lon, max_lon = min(c[1] for c in coords), max(c[1] for c in coords)
+                        data = time_filtered_data.sel(lat=slice(min_lat, max_lat), lon=slice(min_lon, max_lon)).mean(
+                            dim=["lat", "lon"])
+                    else:
+                        return None, {'error': 'No coordinates or lat/lon provided.'}
 
-            # Handle data selection (point or region)
-            # Handle data selection (point or region)
-            if lat and lon:
-                lat, lon = float(lat), float(lon)
-                data = time_filtered_data.sel(lat=lat, lon=lon, method="nearest")
-            elif coordinates:
-                coords = [tuple(map(float, coord.split(','))) for coord in coordinates.split(';')]
-                min_lat, max_lat = min(c[0] for c in coords), max(c[0] for c in coords)
-                min_lon, max_lon = min(c[1] for c in coords), max(c[1] for c in coords)
-
-                # Select the region and compute spatial mean
-                data = time_filtered_data.sel(lat=slice(min_lat, max_lat), lon=slice(min_lon, max_lon)).mean(
-                dim=["lat", "lon"])
-
-            # Convert data to DataFrame
-            time_series_df = data.to_dataframe().reset_index()
-
-            # Close dataset
-            datasets.close()
+                    # Convert data to DataFrame
+                    time_series_df = data.to_dataframe().reset_index()
+            except Exception as e:
+                return None, {'error': str(e)}
 
         return time_series_df, None  # Return DataFrame, no error
 

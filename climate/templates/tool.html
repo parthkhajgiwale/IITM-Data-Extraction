@@ -37,6 +37,10 @@
 	============================================= -->
 	<title>Tool | Data Explorer</title>
 
+	<script src="https://cdn.jsdelivr.net/npm/plotly.js-dist@2.30.0/plotly.min.js"></script>
+
+
+
 </head>
 
 <body class="stretched">
@@ -174,9 +178,10 @@
 				<div id="plot-container" class="plot-container">
     <!-- Time Series Plot Section (hidden by default) -->
     <div id="timeSeriesPlotSection" class="plot-section" style="display: none;">
-        <h3>Time Series Plot</h3>
-        <canvas id="timeSeriesPlot" width="100%" height="400"></canvas>
-    </div>
+		<h3 id="time-series-title"></h3>
+		<div id="timeSeriesPlot" style="width: 100%; height: 400px;"></div>
+	</div>
+	
     
     <!-- Spatial Plot Section (hidden by default) -->
     <div id="spatialPlotSection" class="plot-section" style="display: none;">
@@ -540,11 +545,14 @@ closeBtn.onclick = function () {
         var startDate = document.getElementById('start_date').value;
         var endDate = document.getElementById('end_date').value;
 
-        var url = `/get_timeseries?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}`;
+        var url = `/get_timeseries/?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}`;
 
         fetch(url)
             .then(response => response.json())
             .then(data => {
+                console.log("Fetched data:", data);
+                console.log("Variable:", variable);
+                console.log("First row keys:", Object.keys(data[0]));
                 if (data && data.length > 0) {
                     var times = data.map(row => new Date(row.time));
                     var values = data.map(row => row[variable]);
@@ -565,11 +573,14 @@ closeBtn.onclick = function () {
 
                     document.getElementById('time-series-title').textContent = `${variable} Time Series (${model})`;
 
-                    Plotly.newPlot('plot', [trace], layout);
+                    Plotly.newPlot('timeSeriesPlot', [trace], layout);
 
-                    document.getElementById('plot-container').style.visibility = 'visible';
+                    document.getElementById('timeSeriesPlotSection').style.visibility = 'visible';
+					document.getElementById('timeSeriesPlotSection').style.display = 'block';
+					document.getElementById('plot-container').style.visibility = 'visible';  // Ensure plot-container is visible
+
                 } else {
-                    alert('No data available for the selected parameters.');
+                    //alert('No data available for the selected parameters.');
                 }
             })
             .catch(error => {
@@ -644,7 +655,7 @@ function closePopup() {
     document.getElementById('customPopup').style.display = 'none';
 }
 
-plotTimeSeriesButton.onclick = function() {
+/*plotTimeSeriesButton.onclick = function() {
     if (points.length < 3) {
         showPopup("Please select at least 3 coordinates on the Map!");
         return;
@@ -654,6 +665,7 @@ plotTimeSeriesButton.onclick = function() {
         renderTimeSeriesPlot();
     }
 };
+*/
 
 spatialPlotButton.onclick = function() {
     if (points.length < 3) {
