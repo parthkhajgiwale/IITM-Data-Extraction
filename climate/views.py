@@ -18,7 +18,7 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 import logging
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, authenticate
+from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.decorators import login_required
@@ -48,23 +48,30 @@ def register_view(request):
     if request.method == 'POST':
         form = RegisterForm(request.POST)
         if form.is_valid():
-            user = form.save(commit=False)
-            user.first_name = form.cleaned_data.get('first_name')
-            user.last_name = form.cleaned_data.get('last_name')
-            password = form.cleaned_data.get('password1')  # Get user's password
-            user.set_password(password)  # Hash password before saving
-            user.save()
-            login(request, user)
-            messages.success(request, "Registration successful!")
+            try:
+                user = form.save(commit=False)
+                user.first_name = form.cleaned_data.get('first_name')
+                user.last_name = form.cleaned_data.get('last_name')
+                password = form.cleaned_data.get('password1')
+                user.set_password(password)
+                user.save()
+                login(request, user)
+                messages.success(request, "Registration successful!")
 
-            subject = "Welcome to Our Platform!"
-            message = f"Hello {user.first_name},\n\nYour account has been created successfully.\n\nUsername: {user.username}\nPassword: {password}\n\nPlease change your password after logging in.\n\nBest regards,\nTeam"
-            from_email = settings.DEFAULT_FROM_EMAIL
-            recipient_list = [user.email]
+                subject = "Welcome to Our Platform!"
+                message = f"Hello {user.first_name},\n\nYour account has been created successfully.\n\nUsername: {user.username}\nPassword: {password}\n\nPlease change your password after logging in.\n\nBest regards,\nTeam"
+                from_email = settings.DEFAULT_FROM_EMAIL
+                recipient_list = [user.email]
 
-            send_mail(subject, message, from_email, recipient_list, fail_silently=False)
+                send_mail(subject, message, from_email, recipient_list, fail_silently=False)
 
-            return redirect('home')
+                return redirect('home')
+            except Exception as e:
+                logger.error(f"Error during user registration: {str(e)}")
+                messages.error(request, "An error occurred during registration. Please try again.")
+        else:
+            logger.warning(f"Form validation errors: {form.errors}")
+            messages.error(request, "Please correct the errors below.")
     else:
         form = RegisterForm()
     return render(request, 'loginregister.html', {'form': form})
