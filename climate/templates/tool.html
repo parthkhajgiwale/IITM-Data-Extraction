@@ -565,20 +565,30 @@ closeBtn.onclick = function () {
 
 	// Fetch data for time series
     function fetchData() {
-        var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
-        var variable = document.getElementById('variable').value;
-        var model = document.getElementById('model').value;
-        var startDate = document.getElementById('start_date').value;
-        var endDate = document.getElementById('end_date').value;
+    // Get all selected variables
+    const selectedVariables = [];
+    document.querySelectorAll('#variable-filters input[type="checkbox"]:checked').forEach(checkbox => {
+        selectedVariables.push(checkbox.value);
+    });
 
+    // Check if at least one variable is selected
+    if (selectedVariables.length === 0) {
+        alert('Please select at least one climate variable.');
+        return;
+    }
+
+    var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
+    var model = document.getElementById('model').value;
+    var startDate = document.getElementById('start_date').value;
+    var endDate = document.getElementById('end_date').value;
+
+    // Loop through selected variables and fetch data for each
+    selectedVariables.forEach(variable => {
         var url = `/get_timeseries/?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}`;
 
         fetch(url)
             .then(response => response.json())
             .then(data => {
-                console.log("Fetched data:", data);
-                console.log("Variable:", variable);
-                console.log("First row keys:", Object.keys(data[0]));
                 if (data && data.length > 0) {
                     var times = data.map(row => new Date(row.time));
                     var values = data.map(row => row[variable]);
@@ -592,83 +602,108 @@ closeBtn.onclick = function () {
                     };
 
                     var layout = {
-                        title: `${variable} Time Series (${model})`,
+                        title: `Time Series (${model})`,
                         xaxis: { title: 'Date' },
-                        yaxis: { title: variable }
+                        yaxis: { title: 'Value' }
                     };
-
-                    document.getElementById('time-series-title').textContent = `${variable} Time Series (${model})`;
 
                     Plotly.newPlot('timeSeriesPlot', [trace], layout);
 
+                    document.getElementById('time-series-title').textContent = `Time Series (${model})`;
                     document.getElementById('timeSeriesPlotSection').style.visibility = 'visible';
-					document.getElementById('timeSeriesPlotSection').style.display = 'block';
-					document.getElementById('plot-container').style.visibility = 'visible';  // Ensure plot-container is visible
-
+                    document.getElementById('timeSeriesPlotSection').style.display = 'block';
+                    document.getElementById('plot-container').style.visibility = 'visible';
                 } else {
                     //alert('No data available for the selected parameters.');
                 }
             })
             .catch(error => {
-                console.error('Error fetching data:', error);
-                alert('There was an error fetching the data.');
+                console.error(`Error fetching data for variable ${variable}:`, error);
+                alert(`There was an error fetching data for ${variable}.`);
             });
-    }
+    });
+}
+
 
 	//Spatial Plot
 	function getSpatialPlot() {
-    // Get the coordinates in the correct format
-    var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
-    var variable = document.getElementById('variable').value;
-    var model = document.getElementById('model').value;
-    var startDate = document.getElementById('start_date').value;
-    var endDate = document.getElementById('end_date').value;
+    // Get all selected variables
+    const selectedVariables = [];
+    document.querySelectorAll('#variable-filters input[type="checkbox"]:checked').forEach(checkbox => {
+        selectedVariables.push(checkbox.value);
+    });
 
-    // Construct the URL with a timestamp to avoid caching issues
-    var url = `/get_spatial_plot?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}&timestamp=${new Date().getTime()}`;
+    // Require exactly one variable
+    if (selectedVariables.length === 0) {
+        alert('Please select one climate variable for the spatial plot.');
+        return;
+    } else if (selectedVariables.length > 1) {
+        alert('Please select only one variable for the spatial plot.');
+        return;
+    }
 
-    // Fetch the image from the server
+    const variable = selectedVariables[0];  // Use the one selected variable
+    const coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
+    const model = document.getElementById('model').value;
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+
+    const url = `/get_spatial_plot?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}&timestamp=${new Date().getTime()}`;
+
     fetch(url)
         .then(response => {
-            // Check if the response is OK (status 200)
             if (!response.ok) {
                 throw new Error('Failed to fetch the spatial plot: ' + response.statusText);
             }
-            return response.blob();  // Convert the response to a blob (image data)
+            return response.blob();
         })
         .then(blob => {
-            // Create an image element from the blob response
-            var img = document.createElement('img');
-            img.src = URL.createObjectURL(blob);  // Convert the blob to an object URL
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(blob);
             img.alt = "Spatial Plot";
-            img.style.width = "75%";  // Make sure the image scales properly
+            img.style.width = "75%";
             img.style.height = "auto";
 
-            // Clear previous content and append the new image
-            var container = document.getElementById('plot-container');
-            container.innerHTML = '';  // Clear any existing content
+            const container = document.getElementById('plot-container');
+            container.innerHTML = '';
             container.appendChild(img);
-            container.style.visibility = 'visible';  // Make sure the plot container is visible
+            container.style.visibility = 'visible';
         })
         .catch(error => {
-            // Handle any errors in fetching or displaying the plot
             console.error('Error fetching spatial plot:', error);
             alert('Error fetching spatial plot. Please try again later.');
         });
 }
 
+
  // Download CSV of the time series data
-    function downloadCSV() {
-        var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
-        var variable = document.getElementById('variable').value;
-        var model = document.getElementById('model').value;
-        var startDate = document.getElementById('start_date').value;
-        var endDate = document.getElementById('end_date').value;
+   function downloadCSV() {
+    // Collect all selected variable values from checkboxes
+    const selectedVariables = [];
+    document.querySelectorAll('#variable-filters input[type="checkbox"]:checked').forEach(checkbox => {
+        selectedVariables.push(checkbox.value);
+    });
 
-        var url = `/download_csv?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}`;
-
-        window.location.href = url;
+    // Alert user if no variables are selected
+    if (selectedVariables.length === 0) {
+        showPopup('Please select at least one climate variable before downloading.');
+        return;
     }
+
+    // Prepare query parameters
+    const variableParam = selectedVariables.join(',');  // Comma-separated list
+    const coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
+    const model = document.getElementById('model').value;
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+
+    // Construct the download URL with all parameters
+    const url = `/download_csv?variable=${encodeURIComponent(variableParam)}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${encodeURIComponent(coordinates)}`;
+
+    // Trigger the download
+    window.location.href = url;
+}
+
 
 
 function showPopup(message) {
@@ -728,11 +763,6 @@ document.querySelectorAll('#variable-filters input[type="checkbox"]').forEach(ch
             selectedValues.push(checkedBox.value);
         });
 
-        if (selectedValues.length > 0) {
-            alert("Selected Variables: " + selectedValues.join(", "));
-        } else {
-            alert("No variables selected.");
-        }
     });
 });
 
