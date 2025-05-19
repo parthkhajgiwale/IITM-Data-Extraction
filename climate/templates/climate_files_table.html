@@ -85,8 +85,8 @@
                             <li class="menu-item"><a class="menu-link" href="{% url 'home' %}"><div>Home</div></a></li>
                             <li class="menu-item"><a class="menu-link"><div>Dataset</div></a>
                                 <ul class="sub-menu-container" data-class="up-lg:not-dark">
-                                <li class="menu-item"><a class="menu-link" href="{% url 'climate_files' 'cmip6' %}"><div><i class="bi-database"></i>CMIP6</div></a></li>
-                                <li class="menu-item"><a class="menu-link" href="{% url 'climate_files' 'cordex' %}"><div><i class="bi-database"></i>CORDEX</div></a></li>
+                                <li class="menu-item"><a class="menu-link" href="{% url 'climate_files' 'CMIP6' %}"><div><i class="bi-database"></i>CMIP6</div></a></li>
+                                <li class="menu-item"><a class="menu-link" href="{% url 'climate_files' 'WAS-44I' %}"><div><i class="bi-database"></i>CORDEX</div></a></li>
                                 <li class="menu-item"><a class="menu-link" href="{% url 'climate_files' 'cmip7' %}"><div><i class="bi-database"></i>CMIP7</div></a></li>
                                 </ul>
                             </li>
@@ -126,27 +126,42 @@
             <div class="row g-5">
                 <!-- Sidebar Filters -->
                 <aside class="col-lg-4">
-                    <div class="card shadow-sm border-0">
-    <div class="card-body">
-        <h5 class="card-title mb-3"><i class="bi-filter-circle me-2"></i>Filter by Variable</h5>
-        <form method="get">
-            <div class="mb-3">
-                <label for="variableSelect" class="form-label">Select Variable</label>
-                <select class="form-select" name="variable" id="variableSelect">
-                    <option value="" {% if not selected_vars %}selected{% endif %}>All Variables</option>
-                    {% for var in all_variables %}
-                        <option value="{{ var }}" {% if var in selected_vars %}selected{% endif %}>{{ var|capfirst }}</option>
-                    {% endfor %}
-                </select>
-            </div>
-            <button type="submit" class="btn btn-primary w-100 mt-2">
-                <i class="bi-funnel-fill me-1"></i> Apply Filter
-            </button>
-        </form>
-    </div>
-</div>
+    <div class="card shadow-sm border-0">
+        <!-- Toggle Button -->
+        <button class="btn btn-link w-100 text-start filter-toggle" type="button" style="text-decoration: none;">
+            <i class="bi-filter-circle me-2"></i>Filter by Variable
+        </button>
 
-                </aside>
+        <!-- Filter Content (Initially Hidden via CSS) -->
+        <div class="card-body filter-content" style="display: none;">
+            <form method="get">
+                <div class="mb-3">
+                    <h6>Select Variables</h6>
+
+                    <!-- All Variables Option -->
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="variable" value="" id="allVariables"
+                            {% if not selected_vars %}checked{% endif %}>
+                        <label class="form-check-label" for="allVariables">All Variables</label>
+                    </div>
+
+                    <!-- Dynamic Variables -->
+                    {% for var in all_variables %}
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="variable" value="{{ var }}" id="{{ var }}"
+                                {% if var in selected_vars %}checked{% endif %}>
+                            <label class="form-check-label" for="{{ var }}">{{ var|capfirst }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+
+                <button type="submit" class="btn btn-primary w-100 mt-2">
+                    <i class="bi-funnel-fill me-1"></i> Apply Filter
+                </button>
+            </form>
+        </div>
+    </div>
+</aside>
 
                 <!-- Main Data Table -->
                 <div class="col-lg-8">
@@ -364,5 +379,24 @@
 <script src="{% static 'js/plugins.min.js' %}"></script>
 <script src="{% static 'js/functions.bundle.js' %}"></script>
 <script src="{% static 'js/datepicker.js' %}"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+    const toggleButton = document.querySelector('.filter-toggle');
+    const filterContent = document.querySelector('.filter-content');
+
+    toggleButton.addEventListener('click', function () {
+        const isVisible = window.getComputedStyle(filterContent).display !== 'none';
+
+        if (isVisible) {
+            filterContent.style.display = 'none';
+            this.classList.remove('open');
+        } else {
+            filterContent.style.display = 'block';
+            this.classList.add('open');
+        }
+    });
+});
+
+</script>
 </body>
 </html>

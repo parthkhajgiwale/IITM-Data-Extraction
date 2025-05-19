@@ -114,11 +114,12 @@
 								<li class="menu-item"><a class="menu-link" href="{% url 'home' %}"><div>Home</div></a></li>
 								<li class="menu-item"><a class="menu-link"><div>Dataset</div></a>
 									<ul class="sub-menu-container" data-class="up-lg:not-dark">
-										<li class="menu-item"><a class="menu-link" href="{% url 'climate_files' 'cmip6' %}"><div><i class="bi-database"></i>CMIP6</div></a></li>
-                                		<li class="menu-item"><a class="menu-link" href="{% url 'climate_files' 'cordex' %}"><div><i class="bi-database"></i>CORDEX</div></a></li>
+										<li class="menu-item"><a class="menu-link" href="{% url 'climate_files' 'CMIP6' %}"><div><i class="bi-database"></i>CMIP6</div></a></li>
+                                		<li class="menu-item"><a class="menu-link" href="{% url 'climate_files' 'WAS-44I' %}"><div><i class="bi-database"></i>CORDEX</div></a></li>
                                 		<li class="menu-item"><a class="menu-link" href="{% url 'climate_files' 'cmip7' %}"><div><i class="bi-database"></i>CMIP7</div></a></li>
 									</ul>
 								</li>
+								<li class="menu-item"><a class="menu-link" href="{% url 'home' %}"><div>Explore</div></a></li>
 								<li class="menu-item"><a class="menu-link" href="{% url 'faq' %}"><div>FAQs</div></a></li>
 								<li class="menu-item"><a class="menu-link" href="{% url 'contact' %}"><div>Contact Us</div></a></li>
 							</ul>
@@ -215,17 +216,42 @@
         </div>
 
         <div class="controls">
-            <label for="variable">SELECT CLIMATE VARIABLE</label>
-            <select id="variable">
-                <option value="clt">Total Cloud Cover (clt)</option>
-                <option value="pr">Precipitation (pr)</option>
-                <option value="ta" id="ta-option" disabled>Air Temperature (ta)</option>
-                <option value="tas">Surface Air Temperature (tas)</option>
-                <option value="ua" id="ua-option" disabled>Zonal Wind (ua)</option>
-                <option value="uas">Surface Zonal Wind (uas)</option>
-                <option value="va" id="va-option" disabled>Meridional Wind (va)</option>
-                <option value="vas">Surface Meridional Wind (vas)</option>
-            </select>
+            <label for="variable" class="filter-label">SELECT CLIMATE VARIABLES</label>
+        <button id="toggle-filters" class="btn btn-secondary w-100 mb-3" onclick="toggleFilterContent()">
+            <i class="bi-funnel-fill me-1"></i> Show Variables
+        </button>
+
+        <!-- Filter Content (Initially Hidden) -->
+        <div id="variable-filters" class="filter-contents">
+			<div class="form-check">
+        		<input class="form-check-input" type="checkbox" value="ta" id="ta">
+        		<label class="form-check-label" for="ta">Air Temperature (ta)</label>
+    		</div>
+			<div class="form-check">
+        		<input class="form-check-input" type="checkbox" value="va" id="va">
+        		<label class="form-check-label" for="va">Meridional Wind (va)</label>
+    		</div>
+			<div class="form-check">
+        		<input class="form-check-input" type="checkbox" value="pr" id="pr">
+        		<label class="form-check-label" for="pr">Precipitation (pr)</label>
+    		</div>
+    		<div class="form-check">
+        		<input class="form-check-input" type="checkbox" value="tas" id="tas">
+        		<label class="form-check-label" for="tas">Surface Air Temperature (tas)</label>
+    		</div>
+    		<div class="form-check">
+        		<input class="form-check-input" type="checkbox" value="vas" id="vas">
+        		<label class="form-check-label" for="vas">Surface Meridional Wind (vas)</label>
+    		</div>
+			<div class="form-check">
+        		<input class="form-check-input" type="checkbox" value="clt" id="clt">
+        		<label class="form-check-label" for="clt">Total Cloud Cover (clt)</label>
+    		</div>
+			<div class="form-check">
+        		<input class="form-check-input" type="checkbox" value="ua" id="ua">
+        		<label class="form-check-label" for="ua">Zonal Wind (ua)</label>
+    		</div>
+		</div>
 
             <label for="model">SELECT THE MODEL</label>
             <select id="model">
@@ -539,20 +565,30 @@ closeBtn.onclick = function () {
 
 	// Fetch data for time series
     function fetchData() {
-        var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
-        var variable = document.getElementById('variable').value;
-        var model = document.getElementById('model').value;
-        var startDate = document.getElementById('start_date').value;
-        var endDate = document.getElementById('end_date').value;
+    // Get all selected variables
+    const selectedVariables = [];
+    document.querySelectorAll('#variable-filters input[type="checkbox"]:checked').forEach(checkbox => {
+        selectedVariables.push(checkbox.value);
+    });
 
+    // Check if at least one variable is selected
+    if (selectedVariables.length === 0) {
+        alert('Please select at least one climate variable.');
+        return;
+    }
+
+    var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
+    var model = document.getElementById('model').value;
+    var startDate = document.getElementById('start_date').value;
+    var endDate = document.getElementById('end_date').value;
+
+    // Loop through selected variables and fetch data for each
+    selectedVariables.forEach(variable => {
         var url = `/get_timeseries/?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}`;
 
         fetch(url)
             .then(response => response.json())
             .then(data => {
-                console.log("Fetched data:", data);
-                console.log("Variable:", variable);
-                console.log("First row keys:", Object.keys(data[0]));
                 if (data && data.length > 0) {
                     var times = data.map(row => new Date(row.time));
                     var values = data.map(row => row[variable]);
@@ -566,83 +602,108 @@ closeBtn.onclick = function () {
                     };
 
                     var layout = {
-                        title: `${variable} Time Series (${model})`,
+                        title: `Time Series (${model})`,
                         xaxis: { title: 'Date' },
-                        yaxis: { title: variable }
+                        yaxis: { title: 'Value' }
                     };
-
-                    document.getElementById('time-series-title').textContent = `${variable} Time Series (${model})`;
 
                     Plotly.newPlot('timeSeriesPlot', [trace], layout);
 
+                    document.getElementById('time-series-title').textContent = `Time Series (${model})`;
                     document.getElementById('timeSeriesPlotSection').style.visibility = 'visible';
-					document.getElementById('timeSeriesPlotSection').style.display = 'block';
-					document.getElementById('plot-container').style.visibility = 'visible';  // Ensure plot-container is visible
-
+                    document.getElementById('timeSeriesPlotSection').style.display = 'block';
+                    document.getElementById('plot-container').style.visibility = 'visible';
                 } else {
                     //alert('No data available for the selected parameters.');
                 }
             })
             .catch(error => {
-                console.error('Error fetching data:', error);
-                alert('There was an error fetching the data.');
+                console.error(`Error fetching data for variable ${variable}:`, error);
+                alert(`There was an error fetching data for ${variable}.`);
             });
-    }
+    });
+}
+
 
 	//Spatial Plot
 	function getSpatialPlot() {
-    // Get the coordinates in the correct format
-    var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
-    var variable = document.getElementById('variable').value;
-    var model = document.getElementById('model').value;
-    var startDate = document.getElementById('start_date').value;
-    var endDate = document.getElementById('end_date').value;
+    // Get all selected variables
+    const selectedVariables = [];
+    document.querySelectorAll('#variable-filters input[type="checkbox"]:checked').forEach(checkbox => {
+        selectedVariables.push(checkbox.value);
+    });
 
-    // Construct the URL with a timestamp to avoid caching issues
-    var url = `/get_spatial_plot?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}&timestamp=${new Date().getTime()}`;
+    // Require exactly one variable
+    if (selectedVariables.length === 0) {
+        alert('Please select one climate variable for the spatial plot.');
+        return;
+    } else if (selectedVariables.length > 1) {
+        alert('Please select only one variable for the spatial plot.');
+        return;
+    }
 
-    // Fetch the image from the server
+    const variable = selectedVariables[0];  // Use the one selected variable
+    const coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
+    const model = document.getElementById('model').value;
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+
+    const url = `/get_spatial_plot?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}&timestamp=${new Date().getTime()}`;
+
     fetch(url)
         .then(response => {
-            // Check if the response is OK (status 200)
             if (!response.ok) {
                 throw new Error('Failed to fetch the spatial plot: ' + response.statusText);
             }
-            return response.blob();  // Convert the response to a blob (image data)
+            return response.blob();
         })
         .then(blob => {
-            // Create an image element from the blob response
-            var img = document.createElement('img');
-            img.src = URL.createObjectURL(blob);  // Convert the blob to an object URL
+            const img = document.createElement('img');
+            img.src = URL.createObjectURL(blob);
             img.alt = "Spatial Plot";
-            img.style.width = "75%";  // Make sure the image scales properly
+            img.style.width = "75%";
             img.style.height = "auto";
 
-            // Clear previous content and append the new image
-            var container = document.getElementById('plot-container');
-            container.innerHTML = '';  // Clear any existing content
+            const container = document.getElementById('plot-container');
+            container.innerHTML = '';
             container.appendChild(img);
-            container.style.visibility = 'visible';  // Make sure the plot container is visible
+            container.style.visibility = 'visible';
         })
         .catch(error => {
-            // Handle any errors in fetching or displaying the plot
             console.error('Error fetching spatial plot:', error);
             alert('Error fetching spatial plot. Please try again later.');
         });
 }
 
+
  // Download CSV of the time series data
-    function downloadCSV() {
-        var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
-        var variable = document.getElementById('variable').value;
-        var model = document.getElementById('model').value;
-        var startDate = document.getElementById('start_date').value;
-        var endDate = document.getElementById('end_date').value;
+   function downloadCSV() {
+    // Collect all selected variable values from checkboxes
+    const selectedVariables = [];
+    document.querySelectorAll('#variable-filters input[type="checkbox"]:checked').forEach(checkbox => {
+        selectedVariables.push(checkbox.value);
+    });
 
-        var url = `/download_csv?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}`;
-
-        window.location.href = url;
+    // Alert user if no variables are selected
+    if (selectedVariables.length === 0) {
+        showPopup('Please select at least one climate variable before downloading.');
+        return;
     }
+
+    // Prepare query parameters
+    const variableParam = selectedVariables.join(',');  // Comma-separated list
+    const coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
+    const model = document.getElementById('model').value;
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+
+    // Construct the download URL with all parameters
+    const url = `/download_csv?variable=${encodeURIComponent(variableParam)}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${encodeURIComponent(coordinates)}`;
+
+    // Trigger the download
+    window.location.href = url;
+}
+
 
 
 function showPopup(message) {
@@ -677,6 +738,34 @@ function closePopup() {
         renderSpatialPlot();
     }
 };*/
+
+		// Toggle visibility of filter content
+document.getElementById('toggle-filters').addEventListener('click', function () {
+    const filterContent = document.getElementById('variable-filters');
+    const button = document.getElementById('toggle-filters');
+
+    // Use getComputedStyle to get the actual computed display value
+    const isHidden = window.getComputedStyle(filterContent).display === 'none';
+
+    if (isHidden) {
+        filterContent.style.display = 'block';
+        button.innerHTML = '<i class="bi-funnel-fill me-1"></i> Hide Variables';
+    } else {
+        filterContent.style.display = 'none';
+        button.innerHTML = '<i class="bi-funnel-fill me-1"></i> Show Variables';
+    }
+});
+
+document.querySelectorAll('#variable-filters input[type="checkbox"]').forEach(checkbox => {
+    checkbox.addEventListener('change', function () {
+        const selectedValues = [];
+        document.querySelectorAll('#variable-filters input[type="checkbox"]:checked').forEach(checkedBox => {
+            selectedValues.push(checkedBox.value);
+        });
+
+    });
+});
+
 
     </script>
 	<script>

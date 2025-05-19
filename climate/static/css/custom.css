@@ -105,7 +105,7 @@
             left: -350px;
             width: 25%;
             height: 800px;
-            background-color: #2c3e50;
+            background-color: #0fb4dd;
             color: #ecf0f1;
             transition: 0.3s ease-in-out;
             padding: 20px;
@@ -187,8 +187,36 @@
         }
 
         .controls button:hover {
-            background-color: #2980b9;
+            background-color: #2973b9;
         }
+
+         /* Checkbox styling inside filters */
+        .filter-contents{
+            display:none;
+        }
+        #variable-filters .form-check {
+            display: flex;
+            align-items: center;       
+            justify-content: flex-start; 
+            gap: 6px;                 
+            margin-bottom: 8px;       
+        }
+
+        #variable-filters .form-check-input {
+            width: 16px;
+            height: 16px;
+            margin: 0;                 
+            cursor: pointer;
+        }
+
+        #variable-filters .form-check-label {
+            margin: 0;
+            font-size: 14px;
+            color: #ecf0f1;            
+            cursor: pointer;
+            text-decoration: none;
+        }
+
 
         /* Footer Styling */
         .footer {
@@ -509,4 +537,46 @@
 
         .reset-password-box .submit-btn:hover {
             background-color: #218838;
+        }
+
+        /*For Datasets*/
+        /* Hide filter content by default */
+        .filter-content {
+            display: none; 
+            position: absolute; 
+            top: 100%; 
+            left: 0;
+            width: 100%; 
+            background: #fff; 
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1); 
+            z-index: 998; 
+            max-height: 300px; 
+            overflow-y: auto; 
+        }
+
+        /* Adjust filter content when open to avoid overlap */
+        .filter-toggle.open + .filter-content {
+            display: block; 
+        }
+
+        /* Make the filter content transition smoothly */
+        .filter-content {
+            transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+            overflow: hidden;
+        }
+
+        /* Styling for the filter toggle button */
+        .filter-toggle {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #0F66DD;
+            border: none;
+            background: transparent;
+            padding: 10px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .filter-toggle i {
+            margin-right: 10px;
         }
