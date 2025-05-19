@@ -407,8 +407,12 @@ def get_filtered_file_urls(variable, model, start_date, end_date):
     try:
         conn = psycopg2.connect(**DB_CONFIG)
         cursor = conn.cursor()
-        query = """SELECT file_path FROM climate_files WHERE variable_name = %s AND model = %s AND start_year <= %s AND end_year >= %s"""
-        params = (variable, model, start_year, end_year)
+        query = """
+        SELECT file_path FROM climate_files
+        WHERE variable_name = %s AND model = %s
+        AND start_year <= %s AND end_year >= %s
+        """
+        params = (variable, model, end_year, start_year)
         cursor.execute(query, params)
         paths = [row[0] for row in cursor.fetchall()]
         return paths
