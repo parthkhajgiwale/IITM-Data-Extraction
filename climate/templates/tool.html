@@ -216,49 +216,54 @@
         </div>
 
         <div class="controls">
-            <label for="variable" class="filter-label">SELECT CLIMATE VARIABLES</label>
-        <button id="toggle-filters" class="btn btn-secondary w-100 mb-3" onclick="toggleFilterContent()">
-            <i class="bi-funnel-fill me-1"></i> Show Variables
-        </button>
+    <label for="variable" class="filter-label">SELECT CLIMATE VARIABLES</label>
+    <button id="toggle-filters" class="btn btn-secondary w-100 mb-3" onclick="toggleFilterContent()">
+        <i class="bi-funnel-fill me-1"></i> Show Variables
+    </button>
 
-        <!-- Filter Content (Initially Hidden) -->
-        <div id="variable-filters" class="filter-contents">
-			<div class="form-check">
-        		<input class="form-check-input" type="checkbox" value="ta" id="ta">
-        		<label class="form-check-label" for="ta">Air Temperature (ta)</label>
-    		</div>
-			<div class="form-check">
-        		<input class="form-check-input" type="checkbox" value="va" id="va">
-        		<label class="form-check-label" for="va">Meridional Wind (va)</label>
-    		</div>
-			<div class="form-check">
-        		<input class="form-check-input" type="checkbox" value="pr" id="pr">
-        		<label class="form-check-label" for="pr">Precipitation (pr)</label>
-    		</div>
-    		<div class="form-check">
-        		<input class="form-check-input" type="checkbox" value="tas" id="tas">
-        		<label class="form-check-label" for="tas">Surface Air Temperature (tas)</label>
-    		</div>
-    		<div class="form-check">
-        		<input class="form-check-input" type="checkbox" value="vas" id="vas">
-        		<label class="form-check-label" for="vas">Surface Meridional Wind (vas)</label>
-    		</div>
-			<div class="form-check">
-        		<input class="form-check-input" type="checkbox" value="clt" id="clt">
-        		<label class="form-check-label" for="clt">Total Cloud Cover (clt)</label>
-    		</div>
-			<div class="form-check">
-        		<input class="form-check-input" type="checkbox" value="ua" id="ua">
-        		<label class="form-check-label" for="ua">Zonal Wind (ua)</label>
-    		</div>
-		</div>
+    <!-- Filter Content -->
+    <div id="variable-filters" class="filter-contents">
+        <!-- All possible variables -->
+        <div class="form-check variable" data-models="WAS-44i,CMIP6">
+            <input class="form-check-input" type="checkbox" value="pr" id="pr">
+            <label class="form-check-label" for="pr">Precipitation (pr)</label>
+        </div>
+        <div class="form-check variable" data-models="WAS-44i,CMIP6">
+            <input class="form-check-input" type="checkbox" value="tas" id="tas">
+            <label class="form-check-label" for="tas">Surface Air Temperature (tas)</label>
+        </div>
+        <div class="form-check variable" data-models="WAS-44i">
+            <input class="form-check-input" type="checkbox" value="tasmax" id="tasmax">
+            <label class="form-check-label" for="tasmax">Max Surface Air Temperature (tasmax)</label>
+        </div>
+        <div class="form-check variable" data-models="WAS-44i">
+            <input class="form-check-input" type="checkbox" value="tasmin" id="tasmin">
+            <label class="form-check-label" for="tasmin">Min Surface Air Temperature (tasmin)</label>
+        </div>
+        <div class="form-check variable" data-models="WAS-44i,CMIP6">
+            <input class="form-check-input" type="checkbox" value="psl" id="psl">
+            <label class="form-check-label" for="psl">Sea Level Pressure (psl)</label>
+        </div>
+        <div class="form-check variable" data-models="WAS-44i,CMIP6">
+            <input class="form-check-input" type="checkbox" value="uas" id="uas">
+            <label class="form-check-label" for="uas">Surface Zonal Wind (uas)</label>
+        </div>
+        <div class="form-check variable" data-models="WAS-44i,CMIP6">
+            <input class="form-check-input" type="checkbox" value="vas" id="vas">
+            <label class="form-check-label" for="vas">Surface Meridional Wind (vas)</label>
+        </div>
+        <div class="form-check variable" data-models="CMIP6">
+            <input class="form-check-input" type="checkbox" value="ps" id="ps">
+            <label class="form-check-label" for="ps">Surface Pressure (ps)</label>
+        </div>
+    </div>
 
-            <label for="model">SELECT THE MODEL</label>
-            <select id="model">
-                <option value="WAS-44I">WAS-44I</option>
-                <option value="CMIP6">CMIP6</option>
-            </select>
-			
+    <!-- Model Selector -->
+    		<label for="model">SELECT THE MODEL</label>
+    		<select id="model" onchange="updateVariableFilters()">
+        	<option value="WAS-44i">WAS-44i</option>
+        	<option value="CMIP6">CMIP6</option>
+    		</select>
             <label for="start_date">START DATE</label>
             <input type="month" id="start_date">
 			
@@ -770,6 +775,22 @@ document.getElementById('toggle-filters').addEventListener('click', function () 
         button.innerHTML = '<i class="bi-funnel-fill me-1"></i> Show Variables';
     }
 });
+
+function updateVariableFilters() {
+        const selectedModel = document.getElementById('model').value;
+        const variables = document.querySelectorAll('.form-check.variable');
+
+        variables.forEach(el => {
+            const models = el.getAttribute('data-models').split(',');
+            if (models.includes(selectedModel)) {
+                el.style.display = 'block';
+            } else {
+                el.style.display = 'none';
+                el.querySelector('input').checked = false; 
+            }
+        });
+    }
+    window.onload = updateVariableFilters;  //initialize on page load
 
 document.querySelectorAll('#variable-filters input[type="checkbox"]').forEach(checkbox => {
     checkbox.addEventListener('change', function () {
