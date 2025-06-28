@@ -82,7 +82,7 @@ DB_CONFIG = {
     'host': 'localhost',
     'database': 'climate_data',
     'user': 'postgres',
-    'password': 'password'
+    'password': 'your_postgres_password'
 }
 
 DATABASES = {
