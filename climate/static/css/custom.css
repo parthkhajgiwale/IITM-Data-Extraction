@@ -105,7 +105,7 @@
             left: -350px;
             width: 25%;
             height: 800px;
-            background-color: #0fb4dd;
+            background-color: #0F66DD;
             color: #ecf0f1;
             transition: 0.3s ease-in-out;
             padding: 20px;
@@ -179,7 +179,7 @@
         }
 
         .controls button {
-            background-color: #3498db;
+            background-color: #0098fd;
             color: white;
             cursor: pointer;
             border: none;
@@ -187,7 +187,8 @@
         }
 
         .controls button:hover {
-            background-color: #2973b9;
+            background-color: #00f7ff;
+            color:black;
         }
 
          /* Checkbox styling inside filters */
@@ -217,21 +218,30 @@
             text-decoration: none;
         }
 
+        #variable-filters .form-check-input:checked + .form-check-label{
+            color:black;
+        }
+        #variable-filters .form-check-label:hover
+        {
+            color:black;
+        }
 
-        /* Footer Styling */
-        .footer {
+
+        /* Footers Styling of sidebar */
+        .footers {
             margin-top: 20px;
             text-align: center;
             font-size: 14px;
             padding-bottom: 0px;
+            cursor:pointer;
         }
 
-        .footer a {
+        .footers a {
             color: #ecf0f1;
         }
 
-        .footer a:hover {
-            color: blue;
+        .footers a:hover {
+            color: black;
         }
 
         /* For Mobile Responsiveness */
