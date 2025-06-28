@@ -111,7 +111,7 @@
 						<nav class="primary-menu with-arrows">
 
 							<ul class="menu-container">
-								<li class="menu-item"><a class="menu-link" href="{% url 'home' %}"><div>Home</div></a></li>
+								<li class="menu-item"><a class="menu-link" href="{% url 'base' %}"><div>Home</div></a></li>
 								<li class="menu-item"><a class="menu-link"><div>Dataset</div></a>
 									<ul class="sub-menu-container" data-class="up-lg:not-dark">
 										<li class="menu-item"><a class="menu-link" href="{% url 'climate_files' 'CMIP6' %}"><div><i class="bi-database"></i>CMIP6</div></a></li>
@@ -273,9 +273,11 @@
             <button id="func1" onclick="fetchData()">Plot Time Series</button>
             <button id="func2" onclick="downloadCSV()">Download CSV</button>
             <button id="spatial-plot-btn" onclick="getSpatialPlot()">Get Spatial Plot</button>
+            <button id="clear-all" type= "button" onclick="clearAllEntries()" >Clear Entries</button> 
+
         </div>
 
-        <div class="footer" id="Sidebar-footer">
+        <div class="footers" id="Sidebar-footer">
             <p>&copy; CCCR | <a href="#" >About</a> | <a href="#">Support</a> | <a href="#">License</a></p>
         </div>
     </div>
@@ -287,7 +289,7 @@
   </div>
 </div>
 
-				<div class="section dark pt-0 mb-0 bg-color" style="background: url('demos/movers/images/bg-2.png') no-repeat center bottom / 100%; overflow: visible">
+				<div class="section dark pt-0 mb-0 bg-color" style="background: url('#') no-repeat center bottom / 100%; overflow: visible">
 					<svg viewBox="0 0 1960 206.8" class="bg-white">
 						<path class="svg-themecolor" style="opacity:0.2;" d="M0,142.8A2337.49,2337.49,0,0,1,297.5,56.3C569.33-3.53,783.89.22,849.5,2.3c215.78,6.86,382.12,45.39,503.25,73.45,158.87,36.8,283.09,79.13,458.75,54.55A816.49,816.49,0,0,0,1983,86.8v110H0Z"></path>
 						<path class="svg-themecolor" d="M.5,152.8s498-177,849-150,1031,238,1134,94v110H.5Z"></path>
@@ -378,23 +380,7 @@
 									<li class="mb-2"><a href="#">Berkely</a></li>
 									<li class="mb-2"><a href="#">NOAA</a></li>
 									<li class="mb-2"><a href="#">IPCC</a></li>
-								</ul>
-
-							</div>
-						</div>
-						<div class="col-lg-2 col-md-2 col-6">
-							<div class="widget">
-
-								<h4 class="ls-0 mb-4 text-transform-none">Get to Know us</h4>
-
-								<ul class="list-unstyled iconlist ms-0">
-									<li class="mb-2"><a href="#">Corporate</a></li>
-									<li class="mb-2"><a href="#">Agency</a></li>
-									<li class="mb-2"><a href="#">eCommerce</a></li>
-									<li class="mb-2"><a href="#">Personal</a></li>
-									<li class="mb-2"><a href="#">OnePage</a></li>
-								</ul>
-
+                                </ul>
 							</div>
 						</div>
 						<div class="col-lg-4 col-md-4 text-md-end">
@@ -585,35 +571,41 @@ closeBtn.onclick = function () {
 
 	// Fetch data for time series
     function fetchData() {
-    // Get all selected variables
     const selectedVariables = [];
     document.querySelectorAll('#variable-filters input[type="checkbox"]:checked').forEach(checkbox => {
         selectedVariables.push(checkbox.value);
     });
 
-    // Check if at least one variable is selected
     if (selectedVariables.length === 0) {
         alert('Please select at least one climate variable.');
         return;
     }
 
-    var coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
-    var model = document.getElementById('model').value;
-    var startDate = document.getElementById('start_date').value;
-    var endDate = document.getElementById('end_date').value;
+    if (points.length < 3) {
+        alert('Please select at least 3 points on the map.');
+        return;
+    }
 
-    // Loop through selected variables and fetch data for each
+    const coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
+    const model = document.getElementById('model').value;
+    const startDate = document.getElementById('start_date').value;
+    const endDate = document.getElementById('end_date').value;
+
+    // Clear previous plot
+    Plotly.purge('timeSeriesPlot');
+
+    // For each selected variable
     selectedVariables.forEach(variable => {
-        var url = `/get_timeseries/?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}`;
+        const url = `/get_timeseries/?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}`;
 
         fetch(url)
             .then(response => response.json())
             .then(data => {
                 if (data && data.length > 0) {
-                    var times = data.map(row => new Date(row.time));
-                    var values = data.map(row => row[variable]);
+                    const times = data.map(row => new Date(row.time));
+                    const values = data.map(row => row[variable]);
 
-                    var trace = {
+                    const trace = {
                         x: times,
                         y: values,
                         mode: 'lines',
@@ -621,39 +613,33 @@ closeBtn.onclick = function () {
                         name: variable
                     };
 
-                    var layout = {
+                    Plotly.newPlot('timeSeriesPlot', [trace], {
                         title: `Time Series (${model})`,
                         xaxis: { title: 'Date' },
                         yaxis: { title: 'Value' }
-                    };
-
-                    Plotly.newPlot('timeSeriesPlot', [trace], layout);
+                    });
 
                     document.getElementById('time-series-title').textContent = `Time Series (${model})`;
                     document.getElementById('timeSeriesPlotSection').style.visibility = 'visible';
                     document.getElementById('timeSeriesPlotSection').style.display = 'block';
-                    document.getElementById('plot-container').style.visibility = 'visible';
                 } else {
-                    //alert('No data available for the selected parameters.');
+                    alert(`No data available for ${variable}.`);
                 }
             })
             .catch(error => {
                 console.error(`Error fetching data for variable ${variable}:`, error);
-                alert(`There was an error fetching data for ${variable}.`);
+                alert(`Error fetching data for ${variable}.`);
             });
     });
 }
 
-
-	//Spatial Plot
-	function getSpatialPlot() {
-    // Get all selected variables
+	// Spatial Plot
+function getSpatialPlot() {
     const selectedVariables = [];
     document.querySelectorAll('#variable-filters input[type="checkbox"]:checked').forEach(checkbox => {
         selectedVariables.push(checkbox.value);
     });
 
-    // Require exactly one variable
     if (selectedVariables.length === 0) {
         alert('Please select one climate variable for the spatial plot.');
         return;
@@ -662,69 +648,87 @@ closeBtn.onclick = function () {
         return;
     }
 
-    const variable = selectedVariables[0];  // Use the one selected variable
+    if (points.length < 3) {
+        alert('Please select at least 3 points on the map.');
+        return;
+    }
+
+    const variable = selectedVariables[0];
     const coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
     const model = document.getElementById('model').value;
     const startDate = document.getElementById('start_date').value;
     const endDate = document.getElementById('end_date').value;
 
-    const url = `/get_spatial_plot?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}&timestamp=${new Date().getTime()}`;
+    const url = `/get_spatial_plot?variable=${variable}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${coordinates}&timestamp=${Date.now()}`;
 
     fetch(url)
         .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to fetch the spatial plot: ' + response.statusText);
-            }
+            if (!response.ok) throw new Error('Failed to fetch spatial plot');
             return response.blob();
         })
         .then(blob => {
+            const section = document.getElementById('spatialPlotSection');
+            section.innerHTML = '<h3>Spatial Plot</h3>';
+            section.style.display = 'block';
+
             const img = document.createElement('img');
             img.src = URL.createObjectURL(blob);
             img.alt = "Spatial Plot";
-            img.style.width = "75%";
-            img.style.height = "auto";
+            img.style.width = "100%";
+            img.style.borderRadius = "8px";
+            img.style.display = "block";
+            img.style.margin = "0 auto";
 
-            const container = document.getElementById('plot-container');
-            container.innerHTML = '';
-            container.appendChild(img);
-            container.style.visibility = 'visible';
+            section.appendChild(img);
         })
         .catch(error => {
-            console.error('Error fetching spatial plot:', error);
-            alert('Error fetching spatial plot. Please try again later.');
+            console.error('Spatial plot error:', error);
+            alert('Error fetching spatial plot.');
         });
 }
-
-
  // Download CSV of the time series data
    function downloadCSV() {
-    // Collect all selected variable values from checkboxes
+    // Get selected variables
     const selectedVariables = [];
     document.querySelectorAll('#variable-filters input[type="checkbox"]:checked').forEach(checkbox => {
         selectedVariables.push(checkbox.value);
     });
 
-    // Alert user if no variables are selected
     if (selectedVariables.length === 0) {
         showPopup('Please select at least one climate variable before downloading.');
         return;
     }
 
-    // Prepare query parameters
-    const variableParam = selectedVariables.join(',');  // Comma-separated list
+    // Validate map selection
+    if (points.length < 3) {
+        showPopup('Please select at least 3 points on the map to define a spatial region.');
+        return;
+    }
+
     const coordinates = points.map(p => `${p.lat},${p.lon}`).join(';');
     const model = document.getElementById('model').value;
     const startDate = document.getElementById('start_date').value;
     const endDate = document.getElementById('end_date').value;
 
-    // Construct the download URL with all parameters
-    const url = `/download_csv?variable=${encodeURIComponent(variableParam)}&model=${model}&start_date=${startDate}&end_date=${endDate}&coordinates=${encodeURIComponent(coordinates)}`;
+    // Validate date range
+    if (!startDate || !endDate) {
+        showPopup('Please specify both start and end dates.');
+        return;
+    }
 
-    // Trigger the download
+    // Validate model
+    if (!model) {
+        showPopup('Please select a model.');
+        return;
+    }
+
+    // Construct the URL
+    const variableParam = selectedVariables.join(',');
+    const url = `/download_csv?variable=${encodeURIComponent(variableParam)}&model=${encodeURIComponent(model)}&start_date=${startDate}&end_date=${endDate}&coordinates=${encodeURIComponent(coordinates)}&timestamp=${Date.now()}`;
+
+    // Trigger download
     window.location.href = url;
 }
-
-
 
 function showPopup(message) {
     const popup = document.getElementById('customPopup');
@@ -736,28 +740,28 @@ function closePopup() {
     document.getElementById('customPopup').style.display = 'none';
 }
 
-/*plotTimeSeriesButton.onclick = function() {
+plotTimeSeriesButton.onclick = function() {
     if (points.length < 3) {
         showPopup("Please select at least 3 coordinates on the Map!");
         return;
     }
     if (timeSeriesPlotSection.style.display === "none") {
         timeSeriesPlotSection.style.display = "block";
-        renderTimeSeriesPlot();
+        fetchData();
     }
 };
-*/
 
-/*spatialPlotButton.onclick = function() {
-    if (points.length < 3) {
-        showPopup("Please select at least 3 coordinates on the Map!");
+
+spatialPlotButton.onclick = function() {
+    if (points.length < 4) {
+        showPopup("Please select at least 4 coordinates on the Map!");
         return;
     }
     if (spatialPlotSection.style.display === "none") {
         spatialPlotSection.style.display = "block";
-        renderSpatialPlot();
+        getSpatialPlot();
     }
-};*/
+};
 
 		// Toggle visibility of filter content
 document.getElementById('toggle-filters').addEventListener('click', function () {
@@ -801,8 +805,6 @@ document.querySelectorAll('#variable-filters input[type="checkbox"]').forEach(ch
 
     });
 });
-
-
     </script>
 	<script>
 		jQuery('.home-date').datepicker({
@@ -813,5 +815,44 @@ document.querySelectorAll('#variable-filters input[type="checkbox"]').forEach(ch
 	<script>
 		setInterval(fetchProgress, 100000);
 	</script>
+<script>
+function clearAllEntries() {
+    // Uncheck all variable checkboxes
+    document.querySelectorAll('#variable-filters input[type="checkbox"]').forEach(cb => cb.checked = false);
+
+    // Reset dropdown
+    document.getElementById('model').selectedIndex = 0;
+
+    // Clear dates
+    document.getElementById('start_date').value = '';
+    document.getElementById('end_date').value = '';
+
+    // Hide and clear plots
+    document.getElementById('timeSeriesPlotSection').style.display = 'none';
+    document.getElementById('spatialPlotSection').style.display = 'none';
+
+    if (window.Plotly && document.getElementById('timeSeriesPlot')) {
+        Plotly.purge('timeSeriesPlot');
+    }
+
+    // Hide filter panel of variables
+    const variableFilters = document.getElementById('variable-filters');
+    if (variableFilters) {
+        variableFilters.style.display = 'none';
+        document.getElementById('toggle-filters').innerHTML = '<i class="bi-funnel-fill me-1"></i> Show Variables';
+    }
+
+    //Clear coordinates and map polygons
+    points.length = 0;
+    if (polygon) {
+        polygonLayer.removeLayer(polygon);
+        polygon = null;
+    }
+
+    updateCoordinatesTable();  // Also clears the table
+
+    console.log("All inputs and selections cleared.");
+}
+</script>
 </body>
 </html>
