@@ -6,7 +6,7 @@ from bs4 import BeautifulSoup
 # Database connection details
 DB_NAME = "climate_data"
 DB_USER = "postgres"
-DB_PASSWORD = "root"
+DB_PASSWORD = "your_postgres_password"
 DB_HOST = "localhost"
 DB_PORT = "5432"
 
